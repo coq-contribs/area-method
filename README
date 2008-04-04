@@ -1,0 +1,27 @@
+            Implementation of the Area Method
+                 Julien Narboux
+             
+This contribution consists in the formalization of a decision procedure for constructive theorems in affine plane geometry. The procedure implemented is the area method by Chou, Gao and Zhang. 
+
+Here are some examples of theorems shown (automatically):
+
+- Ceva
+- Desargues
+- Pappus
+- Menelaus
+- Gauss line
+- Centroïd
+
+More information about this implementation is available at :
+
+http://www.lix.polytechnique.fr/Labo/Julien.Narboux/phd/index.html
+
+
+References:
+__________
+
+Chou, Gao and Zhang - Machine Proofs in Geometry, Automated Production of Readable Proofs for Geometry Theorems, World Scientific 1994.
+
+Julien Narboux - A decision procedure for geometry in Coq, Proceedings of TPHOLs'2004,Slind Konrad and Bunker Annett and Gopalakrishnan Ganesh editors, LNCS 3223, Springer-Verlag 2004.
+
+Julien Narboux - Thèse : Formalisation et automatisation du raisonnement géométrique, 2006.
