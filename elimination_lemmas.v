@@ -343,13 +343,12 @@ DecompAndAll.
 assert (P<>Q);eauto with Geom.
 assert (parallel P Q R Y)...
 
-(*
 assert (~ Col R Y Q).
 eapply diff_not_col_par_not_col.
 2:apply H1.
 auto.
 Geometry.
-*)
+
 Check (on_line_dex_spec_strong_f R Y P Q).
 
 assert (Th:= (on_line_dex_spec_strong_f P Q R Y H4 H )).

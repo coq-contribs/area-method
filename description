@@ -3,7 +3,12 @@ Title: The Chou, Gao and Zhang area method
 Author: Julien Narboux
 Institution: INRIA FUTURS / Lix
 Date: 2004-2006
-Description: This contribution is the implementation of the Chou, Gao and Zhang's area method decision procedure for affine plane geometry.
-This development contains a formalization of the first two chapters of the book "Machine Proofs in Geometry, Automated Production of Readable Proofs for Geometry Theorems" by Chou, Gao and Zhang.
-The examples shown automatically includes the Ceva, Desargues, Menelaus, Pascal, Centroïd, Pappus, Gauss line theorems.
-Keywords: geometry Chou Gao Zhang affine area method decision procedure automatic theorem provingCategory: Mathematics/Geometry/See also
+Description: This contribution is the implementation of the Chou, Gao
+and Zhang's area method decision procedure for affine plane geometry.
+This development contains a formalization of the first two chapters of
+the book "Machine Proofs in Geometry, Automated Production of Readable
+Proofs for Geometry Theorems" by Chou, Gao and Zhang.  The examples
+shown automatically includes the Ceva, Desargues, Menelaus, Pascal,
+Centroïd, Pappus, Gauss line theorems.
+Keywords: geometry, area method, decision procedure, automatic theorem proving
+Category: Mathematics/Geometry/See also
