@@ -1,11 +1,30 @@
 (***************************************************************************)
-(* Formalization of the Chou, Gao and Zhang's decision procedure.*)
-(* Julien Narboux (Julien.Narboux@inria.fr)                                     *)
-(* LIX/INRIA FUTURS 2004-2006                                                     *)
+(* Formalization of the Chou, Gao and Zhang's decision procedure.          *)
+(* Julien Narboux (Julien@narboux.fr)                                      *)
+(* LIX/INRIA FUTURS 2004-2006                                              *)
+(* University of Strasbourg 2008                                           *)
 (***************************************************************************)
 
 Require  Import area_method.
-Import F_scope.
+
+Lemma l3_43 : forall O A B X Y C D P Q R T r,
+ mratio C A B r ->
+ mratio D A B (0-r) ->
+ inter_ll P O A X Y ->
+ inter_ll Q O B X Y ->
+ inter_ll R O C X Y ->
+ inter_ll T O D X Y ->
+ parallel P R R Q ->
+ R<>Q ->
+ parallel T P T Q ->
+ T<>Q ->
+ P<>T ->
+ P<>R ->
+ ~ Col P X Y ->
+ harmonic P Q R T.
+Proof.
+area_method.
+Qed.
 
 Theorem Ceva :
  forall A B C D E F G P : Point,
@@ -19,6 +38,20 @@ Theorem Ceva :
  parallel B D D C ->
  parallel C E E A -> 
  (A ** F / F ** B) *  (B ** D / D ** C) *  (C ** E / E ** A) = 1.
+Proof.
+area_method.
+Qed.
+
+Lemma l6_217 : forall A B C D E F G H,
+is_midpoint E A B  ->
+is_midpoint F B C ->
+is_midpoint G C D ->
+is_midpoint H D A ->
+parallel H E G F ->
+G<>F ->
+E<>H ->
+~ Col E D A ->
+H**E / G**F = 1.
 Proof.
 area_method.
 Qed.
@@ -74,7 +107,6 @@ forall A B C D E F G P : Point,
 Proof.
 area_method.
 Qed.
-
 
 Theorem th2_41 :
  forall A B C D P Q M : Point,
@@ -169,7 +201,9 @@ Theorem th6_42 :
  P<>A ->
  (2 + 2) * S A K P = (1 + 2) * S A B C.
 Proof.
-area_method.
+am_before_field.
+intuition.
+field_and_conclude.
 Qed.
 
 Theorem th6_43 :
@@ -252,23 +286,6 @@ Theorem th6_7 :
  inter_ll N B A C O ->
  inter_ll M A C B O ->
  S A M L * (S B N M * S C L N) = S A N L * (S B L M * S C N M).
-Proof.
-area_method.
-Qed.
-
-
-(* Takes one minute to compile ! *)
-(* only_use_area_coordinates and field  takes time *)
-
-Theorem th6_259 :
- forall A B C D E F G H R L : Point,
- on_parallel_d E A B D 1 ->
- on_parallel_d G A C F 1 ->
- inter_ll H D E F G ->
- inter_ll R B C H A -> 
- on_parallel_d L B H A 1 -> 
- S F A B <> 0 -> 
- S A C F + S B A D = S C B L.
 Proof.
 area_method.
 Qed.

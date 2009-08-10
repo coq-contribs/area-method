@@ -1,7 +1,8 @@
 (***************************************************************************)
 (* Formalization of the Chou, Gao and Zhang's decision procedure.          *)
-(* Julien Narboux (Julien.Narboux@inria.fr)                                *)
+(* Julien Narboux (Julien@narboux.fr)                                      *)
 (* LIX/INRIA FUTURS 2004-2006                                              *)
+(* University of Strasbourg 2008                                           *)
 (***************************************************************************)
 
 Require Export Bool Peano_dec Eqdep_dec.
@@ -27,7 +28,6 @@ Definition Fdiv (r1 r2 : F) : F := Fmult r1 (Finv r2).
 (* Notations  *)
 (***************)
 
-Module F_scope.
 Delimit Scope F_scope with F.
 Infix "+" := Fplus : F_scope.
 Infix "-" := Fminus : F_scope.
@@ -46,8 +46,6 @@ Notation "/ x" := (Finv x) : F_scope.
 
 Open Scope F_scope.
 
-End F_scope.
-
 (***********)
 (* Axioms *)
 (***********)
@@ -55,8 +53,6 @@ End F_scope.
 (*********************************************************)
 (*      Addition                                                          *)
 (*********************************************************)
-
-Import F_scope.
 
 Axiom Fplus_sym : forall r1 r2 : F, r1 + r2 = r2 + r1.
 Hint Resolve Fplus_sym: field_hints.

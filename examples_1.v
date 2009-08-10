@@ -1,11 +1,11 @@
 (***************************************************************************)
-(* Formalization of the Chou, Gao and Zhang's decision procedure.*)
-(* Julien Narboux (Julien.Narboux@inria.fr)                                     *)
-(* LIX/INRIA FUTURS 2004-2006                                                     *)
+(* Formalization of the Chou, Gao and Zhang's decision procedure.          *)
+(* Julien Narboux (Julien@narboux.fr)                                      *)
+(* LIX/INRIA FUTURS 2004-2006                                              *)
+(* University of Strasbourg 2008                                           *)
 (***************************************************************************)
 
 Require  Import area_method.
-Import F_scope.
 
 (** Transitivity of the parallel predicate expressed constructively *)
 
@@ -66,7 +66,6 @@ forall A B C D E F G Line_3_b Line_6_b,
  inter_ll G C Line_6_b F B  -> 
  parallel E G D F.
 Proof.
-geoInit.
 area_method.
 Qed.
 
@@ -83,14 +82,16 @@ Qed.
 
 Theorem parallelogram_midpoint : 
   forall A B C D I : Point,
-  on_parallel_d D C A B 1 ->
+  on_parallel_d D C A B (0-1) ->
   inter_ll  I A C B D ->
   A<>C ->
   A<>I -> 
   parallel A I A C ->
   A ** I / A**C = 1 / 2.
 Proof.
-area_method.
+am_before_field.
+intuition.
+Ffield.
 Qed.
 
 Theorem Prop51Hartsshornebis :

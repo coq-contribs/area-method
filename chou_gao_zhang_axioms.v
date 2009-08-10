@@ -1,12 +1,12 @@
 (***************************************************************************)
-(* Formalization of the Chou, Gao and Zhang's decision procedure.    *)
-(* Julien Narboux (Julien.Narboux@inria.fr)                                     *)
-(* LIX/INRIA FUTURS 2004-2006                                                     *)
+(* Formalization of the Chou, Gao and Zhang's decision procedure.          *)
+(* Julien Narboux (Julien@narboux.fr)                                      *)
+(* LIX/INRIA FUTURS 2004-2006                                              *)
+(* University of Strasbourg 2008                                           *)
 (***************************************************************************)
 
 Require Export field.
 Require Import Classical.
-Import F_scope.
 
 Ltac Geometry := auto with Geom field_hints.
 
@@ -48,6 +48,11 @@ Axiom A5 : forall A B C D : Point, S A B C = S A B D + S A D C + S D B C.
 Axiom A6 : forall A B C P : Point,
     A <> C -> ~ Col P A C -> Col A B C -> A ** B / A ** C = S P A B / S P A C.
 
+(* Parallelogram axiom *)
+
+Axiom parallel_side_eq_parallel : forall P Q C D,
+  parallel P Q C D -> P**Q=C**D -> C<>D -> parallel D Q P C. 
+
 (** We assume that the field is not of characteristic two *)
 Axiom chara_not_2 : 2 <> 0.
 
@@ -68,7 +73,24 @@ intros.
 apply classic.
 Qed.
 
+Lemma parallel_dec : forall A B C D, parallel A B C D \/ ~ parallel A B C D.
+Proof.
+intros.
+apply classic.
+Qed.
+
+Lemma number_dec : forall r: F, r=0 \/ r<>0.
+Proof.
+intros.
+apply classic.
+Qed.
+
 Ltac cases_equality A B := elim (eq_dec_points A B);intros.
 Ltac cases_col A B C := elim (col_dec A B C);intros.
+Ltac cases_parallel A B C D := elim (parallel_dec A B C D);intros.
+Ltac cases_equality_f r := elim (number_dec r);intros.
+
 Ltac named_cases_equality A B H := elim (eq_dec_points A B);intro H.
 Ltac named_cases_col A B C H := elim (col_dec A B C);intro H.
+Ltac named_cases_parallel A B C D H := elim (parallel_dec A B C D);intro H.
+

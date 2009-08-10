@@ -17,13 +17,37 @@
 # coq_makefile -f Make -o Makefile 
 #
 
-#########################
-#                       #
-# Libraries definition. #
-#                       #
-#########################
+# 
+# This Makefile may take 3 arguments passed as environment variables:
+#   - COQBIN to specify the directory where Coq binaries resides;
+#   - CAMLBIN and CAMLP4BIN to give the path for the OCaml and Camlp4/5 binaries.
+COQLIB:=$(shell $(COQBIN)coqtop -where | sed -e 's/\\/\\\\/g')
+CAMLP4:="$(shell $(COQBIN)coqtop -config | awk -F = '/CAMLP4=/{print $$2}')"
+ifndef CAMLP4BIN
+  CAMLP4BIN:=$(CAMLBIN)
+endif
 
-OCAMLLIBS:=
+CAMLP4LIB:=$(shell $(CAMLP4BIN)$(CAMLP4) -where)
+
+##########################
+#                        #
+# Libraries definitions. #
+#                        #
+##########################
+
+OCAMLLIBS:=-I $(CAMLP4LIB) 
+COQSRCLIBS:=-I $(COQLIB)/kernel -I $(COQLIB)/lib \
+  -I $(COQLIB)/library -I $(COQLIB)/parsing \
+  -I $(COQLIB)/pretyping -I $(COQLIB)/interp \
+  -I $(COQLIB)/proofs -I $(COQLIB)/tactics \
+  -I $(COQLIB)/toplevel -I $(COQLIB)/contrib/cc -I $(COQLIB)/contrib/dp \
+  -I $(COQLIB)/contrib/extraction -I $(COQLIB)/contrib/field \
+  -I $(COQLIB)/contrib/firstorder -I $(COQLIB)/contrib/fourier \
+  -I $(COQLIB)/contrib/funind -I $(COQLIB)/contrib/interface \
+  -I $(COQLIB)/contrib/micromega -I $(COQLIB)/contrib/omega \
+  -I $(COQLIB)/contrib/ring -I $(COQLIB)/contrib/romega \
+  -I $(COQLIB)/contrib/rtauto -I $(COQLIB)/contrib/setoid_ring \
+  -I $(COQLIB)/contrib/subtac -I $(COQLIB)/contrib/xml
 COQLIBS:= -R . AreaMethod
 COQDOCLIBS:=-R . AreaMethod
 
@@ -33,33 +57,25 @@ COQDOCLIBS:=-R . AreaMethod
 #                        #
 ##########################
 
-CAMLP4LIB:=$(shell $(CAMLBIN)camlp5 -where 2> /dev/null || $(CAMLBIN)camlp4 -where)
-CAMLP4:=$(notdir $(CAMLP4LIB))
-COQSRC:=-I $(COQTOP)/kernel -I $(COQTOP)/lib \
-  -I $(COQTOP)/library -I $(COQTOP)/parsing \
-  -I $(COQTOP)/pretyping -I $(COQTOP)/interp \
-  -I $(COQTOP)/proofs -I $(COQTOP)/syntax -I $(COQTOP)/tactics \
-  -I $(COQTOP)/toplevel -I $(COQTOP)/contrib/correctness \
-  -I $(COQTOP)/contrib/extraction -I $(COQTOP)/contrib/field \
-  -I $(COQTOP)/contrib/fourier -I $(COQTOP)/contrib/graphs \
-  -I $(COQTOP)/contrib/interface -I $(COQTOP)/contrib/jprover \
-  -I $(COQTOP)/contrib/omega -I $(COQTOP)/contrib/romega \
-  -I $(COQTOP)/contrib/ring -I $(COQTOP)/contrib/xml \
-  -I $(CAMLP4LIB)
-ZFLAGS:=$(OCAMLLIBS) $(COQSRC)
+ZFLAGS=$(OCAMLLIBS) $(COQSRCLIBS) -I $(CAMLP4LIB)
 OPT:=
 COQFLAGS:=-q $(OPT) $(COQLIBS) $(OTHERFLAGS) $(COQ_XML)
+ifdef CAMLBIN
+  COQMKTOPFLAGS:=-camlbin $(CAMLBIN) -camlp4bin $(CAMLP4BIN)
+endif
 COQC:=$(COQBIN)coqc
 COQDEP:=$(COQBIN)coqdep -c
 GALLINA:=$(COQBIN)gallina
 COQDOC:=$(COQBIN)coqdoc
-CAMLC:=$(CAMLBIN)ocamlc -rectypes -c
-CAMLOPTC:=$(CAMLBIN)ocamlopt -c
-CAMLLINK:=$(CAMLBIN)ocamlc
-CAMLOPTLINK:=$(CAMLBIN)ocamlopt
+COQMKTOP:=$(COQBIN)coqmktop
+CAMLC:=$(CAMLBIN)ocamlc.opt -rectypes
+CAMLOPTC:=$(CAMLBIN)ocamlopt.opt -rectypes
+CAMLLINK:=$(CAMLBIN)ocamlc.opt -rectypes
+CAMLOPTLINK:=$(CAMLBIN)ocamlopt.opt -rectypes
 GRAMMARS:=grammar.cma
 CAMLP4EXTEND:=pa_extend.cmo pa_macro.cmo q_MLast.cmo
-PP:=-pp "$(CAMLBIN)$(CAMLP4)o -I . -I $(COQTOP)/parsing $(CAMLP4EXTEND) $(GRAMMARS) -impl"
+CAMLP4OPTIONS:=
+PP:=-pp "$(CAMLP4BIN)$(CAMLP4)o -I . $(COQSRCLIBS) $(CAMLP4EXTEND) $(GRAMMARS) $(CAMLP4OPTIONS) -impl"
 
 ###################################
 #                                 #
@@ -68,16 +84,14 @@ PP:=-pp "$(CAMLBIN)$(CAMLP4)o -I . -I $(COQTOP)/parsing $(CAMLP4EXTEND) $(GRAMMA
 ###################################
 
 VFILES:=bench_normalization_tactics.v\
-  chou_axioms.v\
-  chou_geometry.v\
+  chou_gao_zhang_axioms.v\
+  basic_geometric_facts.v\
   construction_lemmas.v\
   construction_tactics.v\
   elimination_prepare.v\
-  elimination_lemmas.v\
-  examples_1.v\
-  examples_2.v\
-  examples_3.v\
-  examples_4.v\
+  area_elimination_lemmas.v\
+  area_coords_constructions.v\
+  area_coords_elimination.v\
   field_general_properties.v\
   field.v\
   field_variable_isolation_tactic.v\
@@ -89,13 +103,29 @@ VFILES:=bench_normalization_tactics.v\
   parallel_lemmas.v\
   Rgeometry_tools.v\
   area_method.v\
-  tests_elimination_tactics.v\
+  tests_elimination_tactics_areas.v\
+  tests_elimination_tactics_ratios.v\
+  tests_elimination_tactics_py.v\
+  examples_1.v\
+  examples_2.v\
+  examples_3.v\
+  examples_4.v\
+  examples_5.v\
+  examples_6.v\
+  examples_interactive.v\
+  examples_circumcenter.v\
+  examples_centroid.v\
   simplify_constructions.v\
   constructed_points_elimination.v\
   free_points_elimination.v\
   advanced_parallel_lemmas.v\
   ratios_elimination_lemmas.v\
-  construction_lemmas_2.v
+  construction_lemmas_2.v\
+  euclidean_constructions.v\
+  euclidean_constructions_2.v\
+  pythagoras_difference.v\
+  pythagoras_difference_lemmas.v\
+  py_elimination_lemmas.v
 VOFILES:=$(VFILES:.v=.vo)
 GLOBFILES:=$(VFILES:.v=.glob)
 VIFILES:=$(VFILES:.v=.vi)
@@ -103,36 +133,7 @@ GFILES:=$(VFILES:.v=.g)
 HTMLFILES:=$(VFILES:.v=.html)
 GHTMLFILES:=$(VFILES:.v=.g.html)
 
-all: bench_normalization_tactics.vo\
-  chou_axioms.vo\
-  chou_geometry.vo\
-  construction_lemmas.vo\
-  construction_tactics.vo\
-  elimination_prepare.vo\
-  elimination_lemmas.vo\
-  examples_1.vo\
-  examples_2.vo\
-  examples_3.vo\
-  examples_4.vo\
-  field_general_properties.vo\
-  field.vo\
-  field_variable_isolation_tactic.vo\
-  freepoints.vo\
-  general_tactics.vo\
-  geometry_tools_lemmas.vo\
-  geometry_tools.vo\
-  my_field_tac.vo\
-  parallel_lemmas.vo\
-  Rgeometry_tools.vo\
-  area_method.vo\
-  tests_elimination_tactics.vo\
-  simplify_constructions.vo\
-  constructed_points_elimination.vo\
-  free_points_elimination.vo\
-  advanced_parallel_lemmas.vo\
-  ratios_elimination_lemmas.vo\
-  construction_lemmas_2.vo
-
+all: $(VOFILES) 
 spec: $(VIFILES)
 
 gallina: $(GFILES)
@@ -151,6 +152,12 @@ all.ps: $(VFILES)
 all-gal.ps: $(VFILES)
 	$(COQDOC) -toc -ps -g $(COQDOCLIBS) -o $@ `$(COQDEP) -sort -suffix .v $(VFILES)`
 
+all.pdf: $(VFILES)
+	$(COQDOC) -toc -pdf $(COQDOCLIBS) -o $@ `$(COQDEP) -sort -suffix .v $(VFILES)`
+
+all-gal.pdf: $(VFILES)
+	$(COQDOC) -toc -pdf -g $(COQDOCLIBS) -o $@ `$(COQDEP) -sort -suffix .v $(VFILES)`
+
 
 
 ####################
@@ -160,8 +167,6 @@ all-gal.ps: $(VFILES)
 ####################
 
 .PHONY: all opt byte archclean clean install depend html
-
-.SUFFIXES: .v .vo .vi .g .html .tex .g.tex .g.html
 
 %.vo %.glob: %.v
 	$(COQC) -dump-glob $*.glob $(COQDEBUG) $(COQFLAGS) $*
@@ -184,13 +189,8 @@ all-gal.ps: $(VFILES)
 %.g.html: %.v %.glob
 	$(COQDOC) -glob-from $*.glob -html -g $< -o $@
 
-%.v.d.raw: %.v
-	$(COQDEP) -slash $(COQLIBS) "$<" > "$@"\
-	  || ( RV=$$?; rm -f "$@"; exit $${RV} )
-
-%.v.d: %.v.d.raw
-	$(HIDE)sed 's/\(.*\)\.vo[[:space:]]*:/\1.vo \1.glob:/' < "$<" > "$@" \
-	  || ( RV=$$?; rm -f "$@"; exit $${RV} )
+%.v.d: %.v
+	$(COQDEP) -glob -slash $(COQLIBS) "$<" > "$@" || ( RV=$$?; rm -f "$@"; exit $${RV} )
 
 byte:
 	$(MAKE) all "OPT:=-byte"
@@ -199,21 +199,28 @@ opt:
 	$(MAKE) all "OPT:=-opt"
 
 install:
-	mkdir -p `$(COQC) -where`/user-contrib
-	cp -f $(VOFILES) `$(COQC) -where`/user-contrib
-
-Makefile: Make
-	mv -f Makefile Makefile.bak
-	$(COQBIN)coq_makefile -f Make -o Makefile
-
+	mkdir -p $(COQLIB)/user-contrib
+	(for i in $(VOFILES); do \
+	 install -D $$i $(COQLIB)/user-contrib/AreaMethod/$$i; \
+	 done)
 
 clean:
-	rm -f *.cmo *.cmi *.cmx *.o $(VOFILES) $(VIFILES) $(GFILES) *~
-	rm -f all.ps all-gal.ps all.glob $(VFILES:.v=.glob) $(HTMLFILES) $(GHTMLFILES) $(VFILES:.v=.tex) $(VFILES:.v=.g.tex) $(VFILES:.v=.v.d)
+	rm -f $(VOFILES) $(VIFILES) $(GFILES) *~
+	rm -f all.ps all-gal.ps all.pdf all-gal.pdf all.glob $(VFILES:.v=.glob) $(HTMLFILES) $(GHTMLFILES) $(VFILES:.v=.tex) $(VFILES:.v=.g.tex) $(VFILES:.v=.v.d)
 	- rm -rf html
 
 archclean:
 	rm -f *.cmx *.o
+
+
+printenv: 
+	@echo CAMLC =	$(CAMLC)
+	@echo CAMLOPTC =	$(CAMLOPTC)
+	@echo CAMLP4LIB =	$(CAMLP4LIB)
+
+Makefile: Make
+	mv -f Makefile Makefile.bak
+	$(COQBIN)coq_makefile -f Make -o Makefile
 
 
 -include $(VFILES:.v=.v.d)

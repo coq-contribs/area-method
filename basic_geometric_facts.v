@@ -1,11 +1,11 @@
 (***************************************************************************)
-(* Formalization of the Chou, Gao and Zhang's decision procedure.*)
-(* Julien Narboux (Julien.Narboux@inria.fr)                                     *)
-(* LIX/INRIA FUTURS 2004-2006                                                     *)
+(* Formalization of the Chou, Gao and Zhang's decision procedure.          *)
+(* Julien Narboux (Julien@narboux.fr)                                      *)
+(* LIX/INRIA FUTURS 2004-2006                                              *)
+(* University of Strasbourg 2008                                           *)
 (***************************************************************************)
 
 Require Export geometry_tools.
-Import F_scope.
 
 Theorem field_prop1 : forall a : F, -a=0 -> a=0.
 Proof with try solve [ ring | congruence ].
@@ -21,31 +21,31 @@ Hint Resolve field_prop1 : Geom.
 (** Some propositions about Col *)
 
 Theorem col_1 : forall A B C : Point, Col A B C -> Col B A C.
-Proof with unify_signed_areas;Geometry.
+Proof with uniformize_signed_areas;Geometry.
 unfold Col in |- *.
 intros...
 Qed.
 
 Theorem col_2 : forall A B C : Point, Col A B C -> Col A C B.
-Proof with unify_signed_areas;Geometry.
+Proof with uniformize_signed_areas;Geometry.
 unfold Col in |- *.
 intros...
 Qed.
 
 Theorem col_3 : forall A B C : Point, Col A B C -> Col B C A.
-Proof with unify_signed_areas;Geometry.
+Proof with uniformize_signed_areas;Geometry.
 unfold Col in |- *.
 intros...
 Qed.
 
 Theorem col_4 : forall A B C : Point, Col A B C -> Col C B A.
-Proof with unify_signed_areas;Geometry.
+Proof with uniformize_signed_areas;Geometry.
 unfold Col in |- *.
 intros...
 Qed.
 
 Theorem col_5 : forall A B C : Point, Col A B C -> Col C A B.
-Proof with unify_signed_areas;Geometry.
+Proof with uniformize_signed_areas;Geometry.
 unfold Col in |- *.
 intros...
 Qed.
@@ -99,13 +99,33 @@ Qed.
 
 Hint Resolve notcolnotegal_1 notcolnotegal_2 notcolnotegal_3: Geom.
 
+Theorem notparallelnotegal_1 : forall A B C D, 
+ ~ parallel A B C D -> A<>B.
+Proof.
+intros.
+unfold not;intro.
+subst.
+auto with Geom.
+Qed.
+
+Theorem notparallelnotegal_2 : forall A B C D, 
+ ~ parallel A B C D -> C<>D.
+Proof.
+intros.
+unfold not;intro.
+subst.
+auto with Geom.
+Qed.
+
+Hint Resolve notparallelnotegal_1 notparallelnotegal_2 : Geom.
+
 (** Some usefull lemmas about ratios of signed distances *)
 
 Theorem dirseg_1 :
  forall A B C D : Point, D ** C <> 0 -> A ** B / C ** D = B ** A / D ** C.
 Proof with Geometry.
 intros.
-unifydirseg.
+uniformize_dir_seg.
 field...
 Qed.
 Hint Resolve dirseg_1: Geom.
@@ -113,7 +133,7 @@ Hint Resolve dirseg_1: Geom.
 Theorem dirseg_2 : forall A B C D : Point, A ** B = C ** D -> B ** A = D ** C.
 Proof with Geometry.
 intros.
-unifydirseg.
+uniformize_dir_seg.
 rewrite H.
 auto.
 Qed.
@@ -144,7 +164,7 @@ Theorem dirseg_3 :
  forall A B C D : Point, C ** D <> 0 -> A ** B / C ** D = - (B ** A / C ** D).
 Proof with Geometry.
 intros.
-unifydirseg.
+uniformize_dir_seg.
 field...
 Qed.
 
@@ -152,11 +172,27 @@ Theorem dirseg_4 :
  forall A B C D : Point, C ** D <> 0 -> A ** B / C ** D = - (A ** B / D ** C).
 Proof with Geometry.
 intros...
-unifydirseg.
+uniformize_dir_seg.
 field...
 Qed.
 
 Hint Resolve dirseg_3 dirseg_4: Geom.
+
+Theorem dirseg_simpl_1 : 
+ forall A B, A<>B -> A**B / A**B = 1.
+Proof.
+intros.
+field;auto with Geom.
+Qed.
+
+Theorem dirseg_simpl_2 : 
+ forall A B, A<>B -> B**A / A**B = -(1).
+Proof.
+intros.
+replace (B**A) with (- A**B).
+field;auto with Geom.
+symmetry;auto with Geom.
+Qed.
 
 
 Theorem dirsur_1 :
@@ -164,7 +200,7 @@ Theorem dirsur_1 :
  ~ Col D E F -> S A B C / S D E F = S A C B / S D F E.
 Proof with Geometry.
 intros.
-unify_signed_areas.
+uniformize_signed_areas.
 field...
 Qed.
 Hint Resolve dirsur_1: Geom.
@@ -491,6 +527,65 @@ rewrite H2 in H6...
 assert (Col P Q B)...
 intuition...
 Qed.
+
+Theorem inter_unicity_2 :
+ forall A B P Q M N: Point,
+ ~ parallel P Q A B -> 
+ Col A B M -> Col P Q M -> 
+ Col A B N -> Col P Q N -> 
+ M = N.
+Proof with Geometry.
+intros.
+assert (A<>B)
+ by (intro;subst;auto with Geom).
+assert (P<>Q)
+ by (intro;subst;auto with Geom).
+assert (Col A M N)
+ by (apply (col_trans_1 A B M N);auto).
+assert (Col P M N)
+ by (apply (col_trans_1 P Q M N);auto).
+cases_equality M N;auto.
+assert (Col M A P) 
+by (apply (col_trans_1 M N A P); auto with Geom).
+
+assert (Col B M N) 
+ by (apply (col_trans_1 B A M N);auto with Geom).
+assert (Col Q M N)
+ by (apply (col_trans_1 Q P M N);auto with Geom).
+assert (Col M Q B) 
+ by (apply (col_trans_1 M N Q B);auto with Geom).
+
+cases_equality P M.
+subst.
+unfold parallel, S4 in *.
+rewrite H12 in H.
+basic_simpl.
+clear H7 H9 H1 H3.
+assert (Col M A Q)
+ by (apply  (col_trans_1 M N A Q);auto with Geom).
+intuition.
+
+assert (Col P A Q) 
+by (apply (col_trans_1 P M A Q);auto with Geom).
+
+unfold parallel, S4 in *.
+rewrite H14 in H.
+basic_simpl.
+
+cases_equality Q M.
+subst.
+clear H1 H11 H12 H14.
+assert (Col M P B) 
+by (apply (col_trans_1 M N P B);auto with Geom).
+assert (Col P M B) by auto with Geom.
+intuition.
+
+assert (Col Q B P)
+by (apply (col_trans_1 Q M B P);auto with Geom).
+assert (Col P Q B) by auto with Geom.
+intuition.
+Qed.
+
 
 
 
@@ -1060,7 +1155,7 @@ Theorem par_1 : forall A B C D : Point,
 Proof with Geometry.
 unfold parallel, S4 in |- *.
 intros.
-unify_signed_areas.
+uniformize_signed_areas.
 RewriteVar (S A C B) H.
 ring.
 Qed.

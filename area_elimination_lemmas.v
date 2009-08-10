@@ -1,14 +1,12 @@
 (***************************************************************************)
-(* Formalization of the Chou, Gao and Zhang's decision procedure.         *)
-(* Julien Narboux (Julien.Narboux@inria.fr)                                              *)
-(* LIX/INRIA FUTURS 2004-2006                                                            *)
+(* Formalization of the Chou, Gao and Zhang's decision procedure.          *)
+(* Julien Narboux (Julien@narboux.fr)                                      *)
+(* LIX/INRIA FUTURS 2004-2006                                              *)
+(* University of Strasbourg 2008                                           *)
 (***************************************************************************)
 
-Require  Export "advanced_parallel_lemmas".
+Require  Export advanced_parallel_lemmas.
 Require Export geometry_tools.
-Import F_scope.
-
-
 
 (*********************************************************************)
 (*  Elimination Theorems                                               *)
@@ -104,7 +102,7 @@ assert (P ** Y / P ** Q = S P U V / S4 P U Q V)...
 assert (Q ** Y / P ** Q = S Q U V / S4 P U Q V)...
 replace (Q**Y) with (- Y**Q) in H5.
 2:symmetry;Geometry.
-unify_signed_areas.
+uniformize_signed_areas.
 IsoleVar (Y ** Q) H5...
 rewrite H1.
 rewrite H4.
@@ -146,11 +144,11 @@ unfold on_line_d in *...
 assert (S R A B + S Q A B = S T A B + S P A B).
 apply l2_11a_strong_strong_strong...
 IsoleVar (S T A B) H9.
-unify_signed_areas.
+uniformize_signed_areas.
 rewrite H9 in H6.
 replace (S4 A P B Q) with (S Q A B - S P A B).
 rewrite H6;ring.
-unfold S4 in |- *;unify_signed_areas;ring.
+unfold S4 in |- *;uniformize_signed_areas;ring.
 Qed.
 
 Theorem elim_area_on_parallel :
@@ -204,7 +202,7 @@ Geometry.
 set (D ** C / A ** B).
 replace (S A B C) with (S A B D + f0 * S4 A A B B).
 basic_simpl.
-unify_signed_areas.
+uniformize_signed_areas.
 ring.
 symmetry.
 apply elim_area_on_parallel_d.
@@ -330,68 +328,3 @@ field.
 assert (S4 U T V R<>0)...
 Qed.
 
-(*
-Lemma elim_area_on_inter_line_parallel_f :
-    forall P Q R U V Y A B : Point,
-    on_inter_line_parallel Y R U V P Q ->
-    True ->
-    S A B Y = (S4 P U Q R * S A B V - S4 P V Q R * S A B U) / S4 P U Q V.
-Proof with Geometry.
-intros.
-unfold on_inter_line_parallel in H.
-DecompAndAll.
-assert (P<>Q);eauto with Geom.
-assert (parallel P Q R Y)...
-
-assert (~ Col R Y Q).
-eapply diff_not_col_par_not_col.
-2:apply H1.
-auto.
-Geometry.
-
-Check (on_line_dex_spec_strong_f R Y P Q).
-
-assert (Th:= (on_line_dex_spec_strong_f P Q R Y H4 H )).
-DecompExAnd Th T.
-
-assert (R<>T).
-unfold not;intro;subst T.
-basic_simpl...
-
-assert  (~ parallel U V T R).
-unfold not;intro.
-unfold parallelogram in *.
-DecompAndAll.
-assert (parallel T R P Q)...
-assert (parallel U V P Q).
-eapply parallel_transitivity.
-apply H6.
-Geometry.
-Geometry.
-intuition.
-
-assert ((S A B Y) =  1 / (S4 U T V R) * ((S U T R)*(S A B V) + (S V R T)*(S A B U))). 
-apply elim_area_inter_ll...
-unfold inter_ll...
-
-assert ((S4 U R V T) = (S4 U P V Q)).
-apply l2_11b...
-assert ((S U R T) = (S4 U P R Q)).
-apply l2_12b...
-assert ((S V R T) = (S4 V P R Q)).
-apply l2_12b...
-
-rewrite H12.
-
-replace (S4 P U Q V) with (- S4 U P V Q)...
-rewrite <- H13.
-replace (S4 U R V T) with (- S4 U T V R)...
-replace  (S U T R) with (- S U R T)...
-rewrite H14.
-rewrite H15.
-replace (S4 V P R Q) with (- S4 P V Q R)...
-replace (S4 U P R Q) with (- S4 P U Q R)...
-field.
-apply nonzeromult...
-Qed.
-*)

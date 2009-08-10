@@ -1,56 +1,56 @@
 (***************************************************************************)
-(* Formalization of the Chou, Gao and Zhang's decision procedure.    *)
-(* Julien Narboux (Julien.Narboux@inria.fr)                                *)
+(* Formalization of the Chou, Gao and Zhang's decision procedure.          *)
+(* Julien Narboux (Julien@narboux.fr)                                      *)
 (* LIX/INRIA FUTURS 2004-2006                                              *)
+(* University of Strasbourg 2008                                           *)
 (***************************************************************************)
 
 Require Import "geometry_tools".
 Require Import "Rgeometry_tools".
-Import F_scope.
 
-Ltac local_unify_signed_areas := Runify_signed_areas.
+Ltac local_uniformize_signed_areas := Runiformize_signed_areas.
 (*
-Ltac local_unify_signed_areas := unify_signed_areas.
+Ltac local_uniformize_signed_areas := uniformize_signed_areas.
 *)
 
 Ltac local_basic_simpl := Rbasic_simpl.
 
-Ltac local_unify_signed_areas4 := unify_signed_areas4.
+Ltac local_uniformize_signed_areas4 := uniformize_signed_areas4.
 
-(* Tests unify in the goal *)
+(* Tests uniformize in the goal *)
 
 Lemma test1 : forall A B C :Point, S A B C = S B C A.
 Proof.
 intros.
-local_unify_signed_areas.
+local_uniformize_signed_areas.
 auto.
 Qed.
 
 Lemma test2 : forall A B C :Point, S A B C + S B A C = 0.
 Proof.
 intros.
-local_unify_signed_areas.
+local_uniformize_signed_areas.
 ring.
 Qed.
 
 Lemma test3 : forall A B C :Point, S A B C + S A C B = 0.
 Proof.
 intros.
-local_unify_signed_areas.
+local_uniformize_signed_areas.
 ring.
 Qed.
 
 Lemma test4 : forall A B C :Point, S A B C +- S B C A = 0.
 Proof.
 intros.
-local_unify_signed_areas.
+local_uniformize_signed_areas.
 ring.
 Qed.
 
 Lemma test5 : forall A B C :Point, S A B C - S C A B = 0.
 Proof.
 intros.
-local_unify_signed_areas.
+local_uniformize_signed_areas.
 basic_simpl.
 ring.
 Qed.
@@ -58,7 +58,7 @@ Qed.
 Lemma test6 : forall A B C :Point, S A B C + S C B A = 0.
 Proof.
 intros.
-local_unify_signed_areas.
+local_uniformize_signed_areas.
 ring.
 Qed.
 
@@ -67,35 +67,35 @@ Qed.
 Lemma test7 : forall A B C :Point, S A B C + S B A C = 0 -> 0=0.
 Proof.
 intros.
- progress local_unify_signed_areas.
+ progress local_uniformize_signed_areas.
 ring.
 Qed.
 
 Lemma test8 : forall A B C :Point, S A B C + S A C B = 0 -> 0=0.
 Proof.
 intros.
-progress local_unify_signed_areas.
+progress local_uniformize_signed_areas.
 ring.
 Qed.
 
 Lemma test9 : forall A B C :Point, S A B C - S B C A = 0 -> 0=0.
 Proof.
 intros.
-progress local_unify_signed_areas.
+progress local_uniformize_signed_areas.
 ring.
 Qed.
 
 Lemma test10 : forall A B C :Point, S A B C - S C A B = 0 -> 0=0.
 Proof.
 intros.
-progress local_unify_signed_areas.
+progress local_uniformize_signed_areas.
 ring.
 Qed.
 
 Lemma test11 : forall A B C :Point, S A B C + S C B A = 0 -> 0=0.
 Proof.
 intros.
-progress local_unify_signed_areas.
+progress local_uniformize_signed_areas.
 ring.
 Qed.
 
@@ -104,7 +104,7 @@ Qed.
 Lemma test12 : forall A B C :Point, S A B C - S C A B = 0 -> S A B C + S C B A = 0.
 Proof.
 intros.
-progress local_unify_signed_areas.
+progress local_uniformize_signed_areas.
 ring.
 Qed.
 
@@ -112,7 +112,7 @@ Lemma test13 : forall A B C :Point, S A B C + S C B A = 0 ->
 S A B C + S B A C = 0 -> S A B C - S B C A = 0 .
 Proof.
 intros.
-progress local_unify_signed_areas.
+progress local_uniformize_signed_areas.
 ring.
 Qed.
 
@@ -184,7 +184,7 @@ S A B C + S B A C + S A B C + S B A C +
 S A B C + S B A C + S A B C + S B A C=0.
 Proof.
 intros.
-local_unify_signed_areas.
+local_uniformize_signed_areas.
 basic_simpl.
 Fring.
 Qed.
@@ -194,7 +194,7 @@ Lemma test15 : forall A B C : Point,
 S A B C = 0 -> S B A C = 0.
 Proof.
 intros.
-progress local_unify_signed_areas.
+progress local_uniformize_signed_areas.
 rewrite H.
 ring.
 Qed.
@@ -203,7 +203,7 @@ Lemma test16 : forall A B C : Point,
 S A B C + S B A C = S A B C -> 0=0.
 Proof.
 intros.
-progress local_unify_signed_areas.
+progress local_uniformize_signed_areas.
 ring.
 Qed.
 
@@ -243,7 +243,7 @@ S A B C + S B A C + S A B C + S B A C +
 S A B C + S B A C + S A B C + S B A C =0 -> 0=0.
 Proof.
 intros.
-local_unify_signed_areas.
+local_uniformize_signed_areas.
 auto.
 
 Qed.
@@ -252,7 +252,7 @@ Qed.
 Lemma test172 : forall A B C, S A B C <> 0 -> S C B A = 0 -> S B C A =0 -> 0=1.
 Proof.
 intros.
-local_unify_signed_areas.
+local_uniformize_signed_areas.
 rewrite H1 in H.
 intuition.
 Qed.
@@ -261,7 +261,7 @@ Lemma test173 : forall A B C P,
  - (S A C P / S B C P * (S B A P / S C A P * (S C B P / S A B P))) = 1 -> 0=0.
 Proof.
 intros.
-progress local_unify_signed_areas.
+progress local_uniformize_signed_areas.
 auto.
 Qed.
 
@@ -273,7 +273,7 @@ Lemma test174 : forall A B C P,
 - (S A C P / S B C P * (S B A P / S C A P * (S C B P / S A B P))) = 1.
 Proof.
 intros.
-local_unify_signed_areas.
+local_uniformize_signed_areas.
 intuition.
 Qed.
 
@@ -282,56 +282,56 @@ Qed.
 Lemma test18 : forall A B C D, S4 A B C D = S4 B C D A.
 Proof.
 intros.
-local_unify_signed_areas4.
+local_uniformize_signed_areas4.
 auto.
 Qed.
 
 Lemma test19 : forall A B C D, S4 A B C D = S4 C D A B.
 Proof.
 intros.
-local_unify_signed_areas4.
+local_uniformize_signed_areas4.
 auto.
 Qed.
 
 Lemma test20 : forall A B C D, S4 A B C D = S4 D A B C.
 Proof.
 intros.
-local_unify_signed_areas4.
+local_uniformize_signed_areas4.
 auto.
 Qed.
 
 Lemma test21 : forall A B C D, S4 A B C D = - S4 A D C B.
 Proof.
 intros.
-local_unify_signed_areas4.
+local_uniformize_signed_areas4.
 auto.
 Qed. 
 
 Lemma test22 : forall A B C D, S4 A B C D = - S4  D C B A.
 Proof.
 intros.
-local_unify_signed_areas4.
+local_uniformize_signed_areas4.
 auto.
 Qed. 
 
 Lemma test23 : forall A B C D, S4 A B C D = - S4 C B A D.
 Proof.
 intros.
-local_unify_signed_areas4.
+local_uniformize_signed_areas4.
 auto.
 Qed. 
 
 Lemma test24 : forall A B C D, S4 A B C D = - S4 B A D C.
 Proof.
 intros.
-local_unify_signed_areas4.
+local_uniformize_signed_areas4.
 auto.
 Qed. 
 
 Lemma test25 : forall A B C D, S4 A B C D = - S4 B A D C -> 0=0.
 Proof.
 intros.
-progress local_unify_signed_areas4.
+progress local_uniformize_signed_areas4.
 auto.
 Qed. 
 
@@ -339,65 +339,65 @@ Qed.
 Lemma test26 : forall A B C D, S4 A B C D = - S4 B A D C -> S4 A B C D = - S4 B A D C.
 Proof.
 intros.
-progress local_unify_signed_areas4.
+progress local_uniformize_signed_areas4.
 auto.
 Qed. 
 
 Lemma test27 : forall A C D, S4 A A C D = 0 -> 0=0.
 Proof.
 intros.
-progress local_unify_signed_areas4.
+progress local_uniformize_signed_areas4.
 auto.
 Qed. 
 
 Lemma test28 : forall A C D, S4 C D A A = 0 -> 0=0.
 Proof.
 intros.
-progress local_unify_signed_areas4.
+progress local_uniformize_signed_areas4.
 auto.
 Qed. 
 
 Lemma test29 : forall A C D, S4 A C D A = 0 -> 0=0.
 Proof.
 intros.
-progress local_unify_signed_areas4.
+progress local_uniformize_signed_areas4.
 auto.
 Qed. 
 
 Lemma test30 : forall A C D, S4 C A A D = 0 -> 0=0.
 Proof.
 intros.
-progress local_unify_signed_areas4.
+progress local_uniformize_signed_areas4.
 auto.
 Qed. 
 
 Lemma test31 : forall A C D, S4 C A D A = 0 -> 0=0.
 Proof.
 intros.
-progress local_unify_signed_areas4.
+progress local_uniformize_signed_areas4.
 auto.
 Qed. 
 
 Lemma test32 : forall A C D, S4 A C A D = 0 -> 0=0.
 Proof.
 intros.
-progress local_unify_signed_areas4.
+progress local_uniformize_signed_areas4.
 auto.
 Qed. 
 
-(* tests unify_dirseg *)
+(* tests uniformize_dirseg *)
 
 Lemma test35 : forall A B, A**B=-B**A.
 Proof.
 intros.
-unifydirseg.
-auto.
+uniformize_dir_seg.
+ring.
 Qed.
 
 Lemma test36 : forall A B, A**B=-B**A -> 0=0.
 Proof.
 intros.
-progress unifydirseg.
+progress uniformize_dir_seg.
 auto.
 Qed.
 
@@ -469,7 +469,7 @@ Qed.
 Lemma test49 : forall A B C D,  S4 A B A C + S A A C + 1* S A B C - - S B A C +  A**B + -(C**D) + (C**D) - (A**B)= 0.
 Proof.
 intros.
-local_unify_signed_areas.
+local_uniformize_signed_areas.
 basic_simpl.
 ring.
 Qed.
@@ -494,7 +494,7 @@ Qed.
 Lemma test52 : forall A B C D,  S4 A B A C + S A A C + 1* S A B C - - S B A C +  A**B + -(C**D) + (C**D) - (A**B)= 0 -> 0=0.
 Proof.
 intros.
-progress local_unify_signed_areas.
+progress local_uniformize_signed_areas.
 progress basic_simpl.
 auto.
 Qed.
@@ -558,14 +558,14 @@ Qed.
 Lemma test61 : forall A B C, False -> S A B C=0.
 Proof.
 intros.
-local_unify_signed_areas.
+local_uniformize_signed_areas.
 intuition.
 Qed.
 
 Lemma test62 : forall A B C, False ->  0 = S A B C.
 Proof.
 intros.
-local_unify_signed_areas.
+local_uniformize_signed_areas.
 intuition.
 Qed.
 
@@ -574,7 +574,7 @@ Lemma test65 : forall A B C D E F:Point, S A C D <> 0 ->
 S B A F + S A B F = 0.
 Proof.
 intros.
-local_unify_signed_areas.
+local_uniformize_signed_areas.
 ring.
 Qed.
 

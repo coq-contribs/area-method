@@ -1,11 +1,22 @@
 (***************************************************************************)
-(* Formalization of the Chou, Gao and Zhang's decision procedure.*)
-(* Julien Narboux (Julien.Narboux@inria.fr)                                     *)
-(* LIX/INRIA FUTURS 2004-2006                                                     *)
+(* Formalization of the Chou, Gao and Zhang's decision procedure.          *)
+(* Julien Narboux (Julien@narboux.fr)                                      *)
+(* LIX/INRIA FUTURS 2004-2006                                              *)
+(* University of Strasbourg 2008                                           *)
 (***************************************************************************)
 
 Require  Import area_method.
-Import F_scope.
+
+Lemma l3_44: forall O A X P Q U R G r N,
+ on_line_d P O A r ->
+ inversion Q P O A ->
+ is_midpoint U P O ->
+ inter_lc R O X U N ->
+ inversion G R O A -> 
+ perp G Q O A.
+Proof.
+area_method.
+Qed.
 
 Theorem example6_9 : forall L M N A B C SS:Point,
  parallel A M M C -> 
@@ -19,7 +30,10 @@ Theorem example6_9 : forall L M N A B C SS:Point,
  inter_ll M A C B SS ->
  A**M/M**C+A**N/N**B = A**SS/SS**L.
 Proof.
-area_method.
+am_before_field.
+field_and_conclude.
+field_and_conclude.
+intuition.
 Qed.
 
 Theorem th6_41_b : forall A B C M N L P K X1 X2:Point,
@@ -101,7 +115,6 @@ Proof.
 area_method.
 Qed.
 
-
 Theorem th6_41 : forall A B C M N L P K:Point,
   is_midpoint M A B ->
   is_midpoint N A C ->
@@ -109,11 +122,17 @@ Theorem th6_41 : forall A B C M N L P K:Point,
   is_midpoint L A K ->
   on_inter_parallel_parallel P A C M K B N -> 
   B<>C -> 
-  L<>P ->
+  P<>L ->
+  P<>A ->
+  P<>K ->
   parallel L P B C -> 
-  S A B C <> 0 ->
+  S A B C <> 0 -> 
   2+2 <> 0 ->
   L**P / B**C = (1+2)/(2+2).
 Proof.
+geoInit.
+(* we force the elimination of P first *)
+eliminate P;
 area_method.
 Qed.
+

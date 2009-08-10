@@ -1,13 +1,12 @@
 (***************************************************************************)
 (* Formalization of the Chou, Gao and Zhang's decision procedure.          *)
-(* Julien Narboux (Julien.Narboux@inria.fr)                                *)
+(* Julien Narboux (Julien@narboux.fr)                                      *)
 (* LIX/INRIA FUTURS 2004-2006                                              *)
+(* University of Strasbourg 2008                                           *)
 (***************************************************************************)
 
 Require Export field_general_properties.
-Require Export chou_axioms.
-Import F_scope.
-
+Require Export chou_gao_zhang_axioms.
 
 (* This file contains the lemmas needed by the tactics used as tools for
 both the development and the decision procedure. *)

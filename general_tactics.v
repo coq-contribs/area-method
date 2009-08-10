@@ -1,42 +1,10 @@
 (***************************************************************************)
-(* Formalization of the Chou, Gao and Zhang's decision procedure.*)
-(* Julien Narboux (Julien.Narboux@inria.fr)                                     *)
-(* LIX/INRIA FUTURS 2004-2006                                                     *)
+(* Formalization of the Chou, Gao and Zhang's decision procedure.          *)
+(* Julien Narboux (Julien@narboux.fr)                                      *)
+(* LIX/INRIA FUTURS 2004-2006                                              *)
+(* University of Strasbourg 2008                                           *)
 (***************************************************************************)
 
-Ltac rewrite_all H := 
- match type of H with
- | ?t1 = ?t2 => 
-   let rec aux H :=
-     match goal with
-     | id : context [t1] |- _ => 
-       match type of id with 
-       | t1 = t2 => fail 1 
-       | _ => revert id; try aux H; intro id
-       end
-     | _ => try rewrite H
-     end in
-   aux H
- end.
-
-Ltac rewrite_all_inv H := 
- match type of H with
- | ?t1 = ?t2 => 
-   let rec aux H :=
-     match goal with
-     | id : context [t2] |- _ => 
-       match type of id with 
-       | t1 = t2 => fail 1 
-       | _ => revert id; try aux H; intro id
-       end
-     | _ => try rewrite <- H
-     end in
-   aux H
- end.
-
-Ltac replace_all term1 term2 :=
-let Hn := fresh in 
- (cut (term2=term1);[intro Hn;rewrite <- Hn;rewrite_all_inv Hn; clear Hn|idtac]).
 
 
 Ltac ExistHyp t := match goal with
@@ -62,6 +30,11 @@ Ltac assert_if_not_exist H :=
 
 Ltac suppose t := cut t;[intro|idtac].
 
+Ltac use H := decompose [and ex] H; clear H.
+
+Ltac print_goal := match goal with
+ |- ?G => idtac G
+end.
 
 Ltac DecompEx H P := elim H;intro P;intro;clear H.
 

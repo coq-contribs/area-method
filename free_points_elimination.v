@@ -1,18 +1,17 @@
 (***************************************************************************)
 (* Formalization of the Chou, Gao and Zhang's decision procedure.          *)
-(* Julien Narboux (Julien.Narboux@inria.fr)                                              *)
-(* LIX/INRIA FUTURS 2004-2006                                                            *)
+(* Julien Narboux (Julien@narboux.fr)                                      *)
+(* LIX/INRIA FUTURS 2004-2006                                              *)
+(* University of Strasbourg 2008                                           *)
 (***************************************************************************)
 
-Require Export "freepoints".
+Require Export freepoints.
 
-Import F_scope.
-
-(* Exprime un triplet D E F suivant les coordonnées sur la base A B C *)
+(* Exprime un triplet D E F suivant les coordonnÃ©es sur la base A B C *)
 
 
 Ltac freepoints_independant A B C H D E F :=
-  rewrite_all (freepoint_elimination A B C D E F H).
+  rewrite (free_points_area_elimination A B C D E F H) in *.
 
 (* Exprime tout suivant une base A B C *)
 
@@ -95,7 +94,7 @@ Ltac only_use_area_coordinates :=
    | H:(S ?X1 ?X2 ?X3 <> 0) |- ?X4 =>
        (** If there are three non collinear points in the context we use them *)
        iter_coord_expr X1 X2 X3 H X4; unfold Det3 in *; basic_simpl;
-        unify_signed_areas; basic_simpl
+        uniformize_signed_areas; basic_simpl
    | A:Point, B:Point, H:?A<>?B |- ?X4 =>
        (** Othewise we build a point which is not collinear to two existing points *)
        let T := fresh in 
@@ -113,7 +112,7 @@ Lemma test_only_use_area_coordinates_1 : forall A B C D, S A B C <> 0 -> S D B C
 Proof.
 intros.
 only_use_area_coordinates.
-unify_signed_areas.
+uniformize_signed_areas.
 field.
 auto.
 Qed.
@@ -133,12 +132,4 @@ only_use_area_coordinates.
 field.
 auto.
 Qed.
-
-
-
-
-
-
-
-
 

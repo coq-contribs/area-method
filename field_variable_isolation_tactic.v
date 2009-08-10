@@ -1,12 +1,12 @@
 (***************************************************************************)
-(* Formalization of the Chou, Gao and Zhang's decision procedure.*)
-(* Julien Narboux (Julien.Narboux@inria.fr)                                     *)
-(* LIX/INRIA FUTURS 2004-2006                                                     *)
+(* Formalization of the Chou, Gao and Zhang's decision procedure.          *)
+(* Julien Narboux (Julien@narboux.fr)                                      *)
+(* LIX/INRIA FUTURS 2004-2006                                              *)
+(* University of Strasbourg 2008                                           *)
 (***************************************************************************)
 
 Require Export field.
 Require Export general_tactics.
-Import F_scope.
 
 (*************************************************)
 (* Variable isolation tactic                     *)
@@ -221,7 +221,7 @@ Ltac IsoleVar var H := let T := TypeOf H in
 
 Ltac IsoleVarRing var H := IsoleVar var H; NormalizeRing H.
 
-Ltac RewriteVar var H := IsoleVarRing var H; rewrite_all H.
+Ltac RewriteVar var H := IsoleVarRing var H; try rewrite H in *.
 
 (* Tests *)
 (*
