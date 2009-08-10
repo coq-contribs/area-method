@@ -1,11 +1,11 @@
 (***************************************************************************)
 (* Formalization of the Chou, Gao and Zhang's decision procedure.          *)
-(* Julien Narboux (Julien.Narboux@inria.fr)                                              *)
-(* LIX/INRIA FUTURS 2004-2006                                                            *)
+(* Julien Narboux (Julien@narboux.fr)                                      *)
+(* LIX/INRIA FUTURS 2004-2006                                              *)
+(* University of Strasbourg 2008                                           *)
 (***************************************************************************)
 
-Require Export "elimination_lemmas".
-
+Require Export area_elimination_lemmas.
 
 Theorem combine_inter_parallel : forall A B C E F X Y r, 
 (on_parallel_d X C A B r) -> 

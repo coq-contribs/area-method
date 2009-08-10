@@ -1,15 +1,13 @@
 (***************************************************************************)
-(* Formalization of the Chou, Gao and Zhang's decision procedure.         *)
-(* Julien Narboux (Julien.Narboux@inria.fr)                                              *)
-(* LIX/INRIA FUTURS 2004-2006                                                            *)
+(* Formalization of the Chou, Gao and Zhang's decision procedure.          *)
+(* Julien Narboux (Julien@narboux.fr)                                      *)
+(* LIX/INRIA FUTURS 2004-2006                                              *)
+(* University of Strasbourg 2008-2009                                      *)
 (***************************************************************************)
 
-Require Export "elimination_lemmas".
+Require Export area_elimination_lemmas.
 
-
-Import F_scope.
-
-Theorem C7ex: forall P Q R U V:Point,
+Theorem on_inter_line_parallel_ex: forall P Q R U V:Point,
  ~(parallel P Q U V) -> 
  exists Y:Point, (parallel Y R P Q) /\ (Col Y U V).
 Proof with Geometry.
@@ -66,7 +64,7 @@ Geometry.
 intuition.
 Qed.
 
-Theorem C8ex: forall P Q R U V W:Point,
+Theorem on_inter_parallel_parallel_ex_aux: forall P Q R U V W:Point,
  ~(parallel P Q U V) -> 
 {Y:Point | (parallel Y R P Q) /\ (parallel Y W U V)}.
 Proof with Geometry.
@@ -124,6 +122,19 @@ eapply col_par_par.
 apply H7.
 Geometry.
 Geometry.
+Qed.
+
+Lemma on_inter_parallel_parallel_ex : forall P Q R U V W:Point,
+ ~ parallel P Q U V -> ~ Col R U V ->
+ {Y :Point | (on_inter_parallel_parallel Y R P Q W U V)}.
+Proof.
+intros.
+assert ({Y:Point | (parallel Y R P Q) /\ (parallel Y W U V)}).
+apply on_inter_parallel_parallel_ex_aux;auto.
+elim H1;intros Y HY;use HY;clear H1.
+exists Y.
+unfold on_inter_parallel_parallel.
+repeat split;auto with Geom.
 Qed.
 
 

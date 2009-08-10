@@ -1,11 +1,11 @@
 (***************************************************************************)
-(* Formalization of the Chou, Gao and Zhang's decision procedure.*)
-(* Julien Narboux (Julien.Narboux@inria.fr)                                     *)
-(* LIX/INRIA FUTURS 2004-2006                                                     *)
+(* Formalization of the Chou, Gao and Zhang's decision procedure.          *)
+(* Julien Narboux (Julien@narboux.fr)                                      *)
+(* LIX/INRIA FUTURS 2004-2006                                              *)
+(* University of Strasbourg 2008                                           *)
 (***************************************************************************)
 
-Require Export "chou_geometry".
-Import F_scope.
+Require Export basic_geometric_facts.
 
 Theorem common_point_not_par_aux :
  forall A B C D Y : Point,
@@ -43,6 +43,50 @@ RewriteVar (C ** D) H9...
 Geometry.
 Qed.
 
+Lemma col_par_1 : forall A B C,
+ Col A B C -> parallel A B B C.
+Proof.
+intros.
+unfold parallel, S4, Col in *.
+rewrite H.
+basic_simpl.
+ring.
+Qed.
+
+Lemma col_par_2 : forall A B C,
+ Col A B C -> parallel A B C B.
+Proof.
+intros.
+unfold parallel, S4, Col in *.
+basic_simpl.
+uniformize_signed_areas.
+rewrite H.
+ring.
+Qed.
+
+Lemma col_par_3 : forall A B C,
+ Col A B C -> parallel B A C B.
+Proof.
+intros.
+unfold parallel, S4, Col in *.
+basic_simpl.
+uniformize_signed_areas.
+rewrite H.
+ring.
+Qed.
+
+Lemma col_par_4 : forall A B C,
+ Col A B C -> parallel B A B C.
+Proof.
+intros.
+unfold parallel, S4, Col in *.
+basic_simpl.
+uniformize_signed_areas.
+rewrite H.
+ring.
+Qed.
+
+Hint Resolve col_par_1 col_par_2 col_par_3 col_par_4 : Geom. 
 
 Lemma par_col_col_1 : forall A B C D, 
  parallel A B C D ->
@@ -51,7 +95,7 @@ Lemma par_col_col_1 : forall A B C D,
 Proof.
 intros.
 unfold parallel,S4,Col in *.
-unify_signed_areas.
+uniformize_signed_areas.
 RewriteVar (S A B D) H.
 replace (- (1) * S A C B) with (- S A C B) by ring.
 auto.
@@ -531,7 +575,7 @@ symmetry.
 assert (parallel  C D B A)...
 unfold parallel,S4 in *.
 RewriteVar (S C B D) H9.
-unify_signed_areas.
+uniformize_signed_areas.
 ring.
 Qed.
 

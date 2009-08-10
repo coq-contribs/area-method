@@ -1,25 +1,36 @@
 (***************************************************************************)
-(* Formalization of the Chou, Gao and Zhang's decision procedure.         *)
-(* Julien Narboux (Julien.Narboux@inria.fr)                                              *)
-(* LIX/INRIA FUTURS 2004-2006                                                            *)
+(* Formalization of the Chou, Gao and Zhang's decision procedure.          *)
+(* Julien Narboux (Julien@narboux.fr)                                      *)
+(* LIX/INRIA FUTURS 2004-2006                                              *)
+(* University of Strasbourg 2008                                           *)
 (***************************************************************************)
 
-Require Export "elimination_lemmas".
-Import F_scope.
-
+Require Export area_elimination_lemmas.
 
 (********************************)
 (** Length ratios eliminations *)
 (********************************)
 
 Theorem non_zero_denom_on_line_d_1_length_ratio :
- forall (Y P Q : Point) (l : F), on_line_d Y P Q l -> P <> Q.
+ forall (Y P Q : Point) (l : F), on_line_d Y P Q l -> P<>Q.
+unfold on_line_d in |- *.
+intuition.
+Qed.
+
+Theorem non_zero_denom_on_line_d_1_length_ratio_seg :
+ forall (Y P Q : Point) (l : F), on_line_d Y P Q l -> P**Q <> 0.
 unfold on_line_d in |- *.
 intuition.
 Qed.
 
 Theorem non_zero_denom_on_line_1_length_ratio :
- forall (Y P Q : Point), on_line Y P Q -> P <> Q.
+ forall (Y P Q : Point), on_line Y P Q -> P<>Q.
+unfold on_line in |- *.
+intuition.
+Qed.
+
+Theorem non_zero_denom_on_line_1_length_ratio_seg :
+ forall (Y P Q : Point), on_line Y P Q -> P**Q <> 0.
 unfold on_line in |- *.
 intuition.
 Qed.
@@ -335,7 +346,7 @@ split...
 unfold not;intro;subst U...
 Qed.
 
-(* TODO A<>Y rajouté verifié que c uptodate *)
+(* TODO A<>Y has been added check that implementation takes care of it *)
 
 Lemma non_zero_denom_inter_ll_2_length_ratio :
     forall A C D U V P Q Y : Point,
@@ -640,8 +651,6 @@ Qed.
 (** This lemma is here because the proof depends on ratios elimination
 lemmas *)
 
-(* TODO cas R=Y *)
-
 Lemma elim_area_on_inter_parallel_parallel :
     forall P Q R U V W Y A B : Point,
     on_inter_parallel_parallel Y R P Q W U V ->
@@ -649,6 +658,7 @@ Lemma elim_area_on_inter_parallel_parallel :
     S A B Y = S4 P W Q R / S4 P U Q V * S4 A U B V + S A B W.
 Proof with Geometry.
 intros.
+
 unfold on_inter_parallel_parallel in *.
 DecompAndAll.
 
@@ -680,7 +690,7 @@ Geometry.
 Geometry.
 assert (parallel U V P Q).
 eapply parallel_transitivity with (C:=Y) (D:=R)...
-intuition.
+intuition. 
 
 assert (W**Y/U**V = (S4 W P R Q) / (S4 U P V Q)).
 eapply elim_length_ratio_on_parallel_d_2...
@@ -693,6 +703,44 @@ rewrite H9.
 replace (S4 P U Q V) with (- S4 U P V Q)...
 replace (S4 W P R Q) with (- S4 P W Q R)...
 field;split...
+Qed.
+
+Lemma elim_area_on_inter_parallel_parallel_RY :
+    forall P Q R U V W Y A B : Point,
+    on_inter_parallel_parallel Y R P Q W U V ->
+    R = Y ->
+    S A B Y = S A B W +
+(W ** R / P ** Q + R ** Y / P ** Q) / (U ** V / P ** Q) * S4 A U B V.
+Proof with Geometry.
+intros.
+
+unfold on_inter_parallel_parallel in *.
+DecompAndAll.
+
+assert ((S A B Y) = (S A B W) + (W**Y/U**V) * (S4 A U B V)).
+apply elim_area_on_parallel. 
+unfold on_parallel.
+repeat split...
+unfold not;intro;subst U...
+
+assert (P<>Q).
+unfold not;intro;subst P...
+assert (U<>V).
+unfold not;intro;subst U...
+
+cases_equality Y W.
+subst.
+basic_simpl.
+field...
+
+assert (W ** Y / U ** V = (W ** R / P ** Q + R**Y / P**Q) / (U ** V / P ** Q)).
+apply (elim_length_ratio_on_parallel_d_1 W U V)...
+unfold  on_parallel_d;repeat split...
+field...
+subst...
+rewrite H.
+rewrite H8.
+field...
 Qed.
 
 Lemma elim_length_ratio_on_inter_line_parallel_1 :
@@ -882,7 +930,7 @@ assert (Col P A B).
 eapply col_trans_1 with (B:=Q)...
 assert (parallel A B P Q).
 unfold parallel, S4, Col in *.
-unify_signed_areas.
+uniformize_signed_areas.
 rewrite H1.
 ring_simplify.
 Geometry.
@@ -1006,7 +1054,7 @@ Qed.
 
 Lemma elim_length_ratio_inter_ll_1_spec :
  forall A C U V P Q Y : Point,
- inter_ll Y P Q U V -> S A U V <> 0 -> C <> Y -> (parallel A Y C Y) -> 
+ inter_ll Y P Q U V -> S A U V <> 0 -> C <> Y -> parallel A Y C Y -> 
  A ** Y / C ** Y = S A U V / S C U V.
 Proof.
 intros.
@@ -1026,4 +1074,34 @@ assert (S C U V - 0 = S C U V) by ring.
 rewrite H6.
 auto.
 Qed.
+
+Lemma elim_length_ratio_inter_ll_2_spec :
+ forall A C U V P Q Y : Point,
+ inter_ll Y P Q U V -> S A U V = 0 -> C <> Y -> parallel A Y C Y -> A<>Y ->
+ A ** Y / C ** Y = S A P Q/ S C P Q.
+Proof.
+intros.
+assert (S A P Q <> 0).
+intro.
+unfold inter_ll in H.
+use H.
+assert (Col A U V) by auto with Geom.
+assert (Col A P Q) by auto with Geom.
+assert (A=Y).
+eapply inter_unicity_2;eauto.
+auto with Geom.
+auto with Geom.
+auto with Geom.
+auto with Geom.
+intuition.
+
+assert (inter_ll Y U V P Q).
+unfold inter_ll in *.
+intuition auto with Geom.
+eapply elim_length_ratio_inter_ll_1_spec;eauto.
+Qed.
+
+
+
+
 

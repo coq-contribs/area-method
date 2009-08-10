@@ -1,11 +1,11 @@
 (***************************************************************************)
-(* Formalization of the Chou, Gao and Zhang's decision procedure.*)
-(* Julien Narboux (Julien.Narboux@inria.fr)                                     *)
-(* LIX/INRIA FUTURS 2004-2006                                                     *)
+(* Formalization of the Chou, Gao and Zhang's decision procedure.          *)
+(* Julien Narboux (Julien@narboux.fr)                                      *)
+(* LIX/INRIA FUTURS 2004-2006                                              *)
+(* University of Strasbourg 2008                                           *)
 (***************************************************************************)
 
 Require  Import area_method.
-Import F_scope.
 
 (** The Pappus line theorem *)
 
@@ -30,6 +30,8 @@ Theorem Pappus_2 : forall A B C A' B' C' P Q R T:Point,
   inter_ll R B' C B C' ->
   inter_ll T B' C P Q ->
   C<>R -> C<>T ->
+  parallel B' R C R ->
+  parallel B' T C T ->
   B'**R / C**R = B'**T / C**T.
 Proof.
 area_method.

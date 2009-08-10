@@ -1,14 +1,14 @@
 (***************************************************************************)
-(* Formalization of the Chou, Gao and Zhang's decision procedure.*)
-(* Julien Narboux (Julien.Narboux@inria.fr)                                     *)
-(* LIX/INRIA FUTURS 2004-2006                                                     *)
+(* Formalization of the Chou, Gao and Zhang's decision procedure.          *)
+(* Julien Narboux (Julien@narboux.fr)                                      *)
+(* LIX/INRIA FUTURS 2004-2006                                              *)
+(* University of Strasbourg 2008                                           *)
 (***************************************************************************)
 
 Require Export "geometry_tools_lemmas".
 Require Export "general_tactics".
 Require Import List.
 Require Import Quote.
-Import F_scope.
 
 Inductive AVars : Type :=  
   | PVar : Point -> AVars
@@ -277,7 +277,7 @@ Ltac simplif_term exp :=
   let lvar := build_numbered_var_list exp in 
   let trm := interp_A lvar exp in 
   let trm2 :=constr:(interp_AF_to_F lvar (simplif trm)) in 
- (replace_all exp trm2;[simpl|rewrite simplif_correct;trivial]).
+ (replace exp with trm2 in *;[simpl|rewrite simplif_correct;trivial]).
 
 Ltac Rbasic_simpl := match goal with 
 _:_ |- ?X1 = ?X2 => simplif_term X1;simplif_term X2;unfold interp_AP_to_Point;simpl
@@ -292,21 +292,21 @@ Fixpoint natle (n m:nat) {struct m} : bool :=
   | _, _ => false
   end.
 
-Fixpoint unify_areas (e:AF) {struct e} : AF :=
+Fixpoint uniformize_areas (e:AF) {struct e} : AF :=
 match e with 
   | AFplus e1 e2 => 
-    let s1 := (unify_areas e1) in 
-    let s2 := (unify_areas e2) in 
+    let s1 := (uniformize_areas e1) in 
+    let s2 := (uniformize_areas e2) in 
     AFplus s1 s2
   | AFmult e1 e2 =>
-    let s1 := (unify_areas e1) in 
-    let s2 := (unify_areas e2) in 
+    let s1 := (uniformize_areas e1) in 
+    let s2 := (uniformize_areas e2) in 
     AFmult s1 s2
   | AFopp e1 =>
-    let s1 := (unify_areas e1) in 
+    let s1 := (uniformize_areas e1) in 
     AFopp s1
   | AFinv e1 =>
-    let s1 := (unify_areas e1) in 
+    let s1 := (uniformize_areas e1) in 
     AFinv s1
   | AS e1 e2 e3 => if (natle e1 e2) then 
                                  (if (natle e2 e3) then (AS e1 e2 e3) else 
@@ -318,18 +318,18 @@ match e with
   | _ => e
 end.
 
-Lemma unify_areas_correct : 
+Lemma uniformize_areas_correct : 
 forall (e:AF) (lvar:list (prodT AVars nat)),
-   interp_AF_to_F lvar (unify_areas e) =
+   interp_AF_to_F lvar (uniformize_areas e) =
    interp_AF_to_F lvar e.
 intros.
 induction e;trivial;simpl interp_AF_to_F at 2.
 simpl;case (natle n n0);case (natle n0 n1);case (natle n n1);simpl;Geometry.
 simpl;case (natle n n0);simpl;symmetry;Geometry.
-rewrite <- IHe1;rewrite <- IHe2;simpl unify_areas at 1;destruct (unify_areas e1);destruct (unify_areas e2);trivial;ring.
-rewrite <- IHe1;rewrite <- IHe2;simpl unify_areas at 1;destruct (unify_areas e1);destruct (unify_areas e2);trivial;ring.
-rewrite <- IHe;simpl unify_areas at 1;destruct (unify_areas e);trivial;ring.
-rewrite <- IHe;simpl unify_areas at 1;destruct (unify_areas e);trivial;ring.
+rewrite <- IHe1;rewrite <- IHe2;simpl uniformize_areas at 1;destruct (uniformize_areas e1);destruct (uniformize_areas e2);trivial;ring.
+rewrite <- IHe1;rewrite <- IHe2;simpl uniformize_areas at 1;destruct (uniformize_areas e1);destruct (uniformize_areas e2);trivial;ring.
+rewrite <- IHe;simpl uniformize_areas at 1;destruct (uniformize_areas e);trivial;ring.
+rewrite <- IHe;simpl uniformize_areas at 1;destruct (uniformize_areas e);trivial;ring.
 Qed.
 
 Ltac generalize_all := 
@@ -338,10 +338,10 @@ Ltac generalize_all :=
 end.
 
 
-Ltac unify_term exp lvar :=
+Ltac uniformize_term exp lvar :=
   let trm := interp_A lvar exp in 
-  let trm2 :=constr:(interp_AF_to_F lvar (unify_areas trm)) in
-(replace exp with trm2;[idtac|rewrite unify_areas_correct;trivial]).
+  let trm2 :=constr:(interp_AF_to_F lvar (uniformize_areas trm)) in
+(replace exp with trm2;[idtac|rewrite uniformize_areas_correct;trivial]).
 
 (* This is a metaification to collect the list of all points *)
 
@@ -355,19 +355,19 @@ Inductive formula2 : Type :=
   | f_neq : AF -> AF -> formula2 
   | f_eq : AF -> AF -> formula2.
 
-Fixpoint unify_areas_formula2 (e:formula2) {struct e} : formula2 :=
+Fixpoint uniformize_areas_formula2 (e:formula2) {struct e} : formula2 :=
 match e with 
   | f_imp2 e1 e2 => 
-    let s1 := (unify_areas_formula2 e1) in 
-    let s2 := (unify_areas_formula2 e2) in 
+    let s1 := (uniformize_areas_formula2 e1) in 
+    let s2 := (uniformize_areas_formula2 e2) in 
     f_imp2 s1 s2
   | f_neq e1 e2 =>
-    let s1 := (unify_areas e1) in 
-    let s2 := (unify_areas e2) in 
+    let s1 := (uniformize_areas e1) in 
+    let s2 := (uniformize_areas e2) in 
     f_neq s1 s2
   | f_eq e1 e2 =>
-    let s1 := (unify_areas e1) in 
-    let s2 := (unify_areas e2) in 
+    let s1 := (uniformize_areas e1) in 
+    let s2 := (uniformize_areas e2) in 
     f_eq s1 s2
 end.
 
@@ -387,26 +387,26 @@ Fixpoint interp_formula2_to_prop (lvar:list (prodT AVars nat)) (e:formula2) {str
         s1 = s2
 end.
 
-Lemma unify_areas_formula2_correct_gen : 
+Lemma uniformize_areas_formula2_correct_gen : 
 forall (e:formula2) (lvar:list (prodT AVars nat)),
-   interp_formula2_to_prop lvar (unify_areas_formula2 e) <->
+   interp_formula2_to_prop lvar (uniformize_areas_formula2 e) <->
    interp_formula2_to_prop lvar e.
 Proof.
 intros.
 induction e;simpl interp_formula2_to_prop;
-repeat rewrite unify_areas_correct ;intuition.
+repeat rewrite uniformize_areas_correct ;intuition.
 Qed.
 
-Lemma unify_areas_formula2_correct :
+Lemma uniformize_areas_formula2_correct :
 forall (e:formula2) (lvar:list (prodT AVars nat)),
-   interp_formula2_to_prop lvar (unify_areas_formula2 e) ->
+   interp_formula2_to_prop lvar (uniformize_areas_formula2 e) ->
    interp_formula2_to_prop lvar e.
 Proof.
 intros.
 assert 
-(   interp_formula2_to_prop lvar (unify_areas_formula2 e) <->
+(   interp_formula2_to_prop lvar (uniformize_areas_formula2 e) <->
    interp_formula2_to_prop lvar e).
-apply unify_areas_formula2_correct_gen.
+apply uniformize_areas_formula2_correct_gen.
 intuition.
 Qed.
 
@@ -470,22 +470,22 @@ Ltac interp_formula2_goal lvar :=
  _:_ |- ?X1 => interp_formula2 lvar X1
 end.
 
-Ltac unify_formula2_goal lvar :=
+Ltac uniformize_formula2_goal lvar :=
   let trm := interp_formula2_goal lvar in
-  let trm2 :=constr:(interp_formula2_to_prop lvar (unify_areas_formula2 trm)) in
+  let trm2 :=constr:(interp_formula2_to_prop lvar (uniformize_areas_formula2 trm)) in
   let id := fresh in (
 assert (id:(trm2-> interp_formula2_to_prop lvar trm));
-[apply unify_areas_formula2_correct|idtac];
+[apply uniformize_areas_formula2_correct|idtac];
 simpl in id;
-(* voir problème de changement de nom d'hypothèse
+(* voir problÃ¨me de changement de nom d'hypothÃ¨se
 vm_compute in id; *) 
 unfold interp_AP_to_Point in id;simpl in id;unfold implies;
 apply id;clear id
 ).
 (*
-Ltac unify_formula2_goal lvar :=
+Ltac uniformize_formula2_goal lvar :=
   match goal with
- _:_ |- ?X1 => unify_formula2 X1 lvar 
+ _:_ |- ?X1 => uniformize_formula2 X1 lvar 
 end.
 *)
 Ltac prepare_goal2 lvar := generalize_all_eq_neqF;put_implies;interp_formula2_goal lvar.
@@ -526,50 +526,50 @@ Ltac compute_vars_of_the_goal :=
        varlist
 end.
 
-Ltac unify_quantities varlist trm :=
+Ltac uniformize_quantities varlist trm :=
   match constr:trm with
-   | interp_f ?X1 => unify_quantities varlist X1 
-   | f_imp ?X1 ?X2 => unify_quantities varlist X1;unify_quantities varlist X2
+   | interp_f ?X1 => uniformize_quantities varlist X1 
+   | f_imp ?X1 ?X2 => uniformize_quantities varlist X1;uniformize_quantities varlist X2
    | f_const ?X1 => 
                 (match constr:X1 with 
-                    ?X1 = ?X2 => unify_term X1 varlist;unify_term X2 varlist
-                  | ?X1 <> ?X2 => unify_term X1 varlist;unify_term X2 varlist
+                    ?X1 = ?X2 => uniformize_term X1 varlist;uniformize_term X2 varlist
+                  | ?X1 <> ?X2 => uniformize_term X1 varlist;uniformize_term X2 varlist
                     |_ => idtac
                    end)
    end.
 
-Ltac unify_quantities_of_the_goal varlist :=
+Ltac uniformize_quantities_of_the_goal varlist :=
  match goal with 
-  _:_ |- ?XG => unify_quantities varlist  XG
+  _:_ |- ?XG => uniformize_quantities varlist  XG
 end.
 
-Ltac unify_quantities_of_all varlist :=
+Ltac uniformize_quantities_of_all varlist :=
  repeat
   match goal with 
-	  _:_ |- context [?X1 = ?X2] => progress unify_term X1 varlist
-          |_:_ |- context [?X1 = ?X2] => progress unify_term X2 varlist
-	  |H: context [?X1 <> ?X2] |- _ => progress unify_term X1 varlist
-          |H: context [?X1 <> ?X2] |- _ => progress unify_term X2 varlist
-	  |H: context [?X1 = ?X2] |- _ => progress unify_term X1 varlist
-	  |H: context [?X1 = ?X2] |- _ => progress unify_term X2 varlist
+	  _:_ |- context [?X1 = ?X2] => progress uniformize_term X1 varlist
+          |_:_ |- context [?X1 = ?X2] => progress uniformize_term X2 varlist
+	  |H: context [?X1 <> ?X2] |- _ => progress uniformize_term X1 varlist
+          |H: context [?X1 <> ?X2] |- _ => progress uniformize_term X2 varlist
+	  |H: context [?X1 = ?X2] |- _ => progress uniformize_term X1 varlist
+	  |H: context [?X1 = ?X2] |- _ => progress uniformize_term X2 varlist
 end.
 (*
-Ltac Runify_signed_areas := 
+Ltac Runiformize_signed_areas := 
   unfold Fminus, Fdiv in *;   
   prepare_goal;
   let varlist := compute_vars_of_the_goal in
- (repeat (progress unify_quantities_of_the_goal varlist);un_prepare_goal).
+ (repeat (progress uniformize_quantities_of_the_goal varlist);un_prepare_goal).
 *)
 (*
-  (unify_quantities_of_the_goal varlist;
+  (uniformize_quantities_of_the_goal varlist;
    unfold interp_AP_to_Point;simpl;
    un_prepare_goal
    ). *)
 
-Ltac Runify_signed_areas := 
+Ltac Runiformize_signed_areas := 
   unfold Fminus, Fdiv in *;   
   prepare_goal;
   let varlist := compute_vars_of_the_goal in
   (un_prepare_goal; put_eq_neqF;generalize_all_eq_neqF;put_implies;
-    unify_formula2_goal varlist;intros).
+    uniformize_formula2_goal varlist;intros).
 

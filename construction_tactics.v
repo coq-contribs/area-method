@@ -1,11 +1,11 @@
 (***************************************************************************)
-(* Formalization of the Chou, Gao and Zhang's decision procedure.*)
-(* Julien Narboux (Julien.Narboux@inria.fr)                                     *)
-(* LIX/INRIA FUTURS 2004-2006                                                     *)
+(* Formalization of the Chou, Gao and Zhang's decision procedure.          *)
+(* Julien Narboux (Julien@narboux.fr)                                      *)
+(* LIX/INRIA FUTURS 2004-2006                                              *)
+(* University of Strasbourg 2008                                           *)
 (***************************************************************************)
 
 Require  Export construction_lemmas_2.
-Import F_scope.
 
 Ltac point_on_line I A B :=
 let id1 := fresh in ((assert (id1:{Y : Point | Col Y A B});

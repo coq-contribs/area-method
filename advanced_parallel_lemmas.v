@@ -1,17 +1,15 @@
 (***************************************************************************)
-(* Formalization of the Chou, Gao and Zhang's decision procedure.*)
-(* Julien Narboux (Julien.Narboux@inria.fr)                                     *)
-(* LIX/INRIA FUTURS 2004-2006                                                     *)
+(* Formalization of the Chou, Gao and Zhang's decision procedure.          *)
+(* Julien Narboux (Julien@narboux.fr)                                      *)
+(* LIX/INRIA FUTURS 2004-2006                                              *)
+(* University of Strasbourg 2008                                           *)
 (***************************************************************************)
 
-Require Export "construction_lemmas".
-
-Import F_scope.
+Require Export construction_lemmas.
 
 Definition weak_parallelogram (A B C D : Point) : Prop :=
   A<>C /\ B<>D /\
   exists O, mid_point O A C /\ mid_point O B D.
-
 
 Lemma parallelogram_weak_parallelogram : forall A B C D,
  parallelogram A B C D -> weak_parallelogram A B C D.
@@ -136,6 +134,19 @@ Qed.
 Definition  weak_3_parallelogram (A B C D : Point) : Prop :=
   exists O, mid_point O A C /\ mid_point O B D.
 
+Lemma weak_para_1 : forall W S V U, 
+weak_3_parallelogram W S V U -> weak_3_parallelogram U V S W.
+Proof.
+intros.
+unfold weak_3_parallelogram in *.
+decompose [ex and] H.
+exists x.
+split; auto with Geom.
+Qed.
+
+Hint Resolve weak_para_1 : Geom.
+
+
 Theorem l2_11a_strong_strong_strong_aux :
  forall A B C D P Q : Point, A=C ->
  weak_3_parallelogram A B C D -> S A P Q + S C P Q = S B P Q + S D P Q.
@@ -196,7 +207,7 @@ replace (A**B/B**A) with (- (1)) in H.
 IsoleVar (S Q A B) H.
 replace (S B A Q) with (- S Q A B).
 rewrite H.
-unify_signed_areas.
+uniformize_signed_areas.
 ring.
 Geometry.
 Geometry.
@@ -265,7 +276,8 @@ intuition.
 Qed.
 
 Theorem l2_11b :
- forall A B C D P Q : Point, parallelogram A B C D -> S4 P A Q B = S4 P D Q C.
+ forall A B C D P Q : Point, parallelogram A B C D -> 
+ S4 P A Q B = S4 P D Q C.
 Proof with Geometry.
 intros.
 unfold S4 in |- *.
@@ -336,7 +348,7 @@ basic_simpl...
 assert (S4 D B C P = S D B C + S D C P)...
 assert (S4 D B C P = S P D C - S A D C).
 rewrite H1.
-unify_signed_areas.
+uniformize_signed_areas.
 rewrite H0.
 ring.
 
@@ -344,14 +356,14 @@ assert (S P A B = S P D B - S P C B).
 assert (S A B P + S C B P = S D B P + S B B P).
 apply l2_11a...
 basic_simpl.
-unify_signed_areas.
+uniformize_signed_areas.
 rewrite <- H3.
 ring.
 
 rewrite H3.
 
 assert (S4 D B C P = S D B P - S C B P)...
-unify_signed_areas.
+uniformize_signed_areas.
 congruence.
 Qed.
 
@@ -369,7 +381,7 @@ basic_simpl...
 assert (S4 D B C P = S D B C + S D C P)...
 assert (S4 D B C P = S P D C - S A D C).
 rewrite H1.
-unify_signed_areas.
+uniformize_signed_areas.
 rewrite H0.
 ring.
 
@@ -380,14 +392,14 @@ unfold weak_3_parallelogram in *.
 DecompExAnd H Z.
 exists Z;split...
 basic_simpl.
-unify_signed_areas.
+uniformize_signed_areas.
 rewrite <- H3.
 ring.
 
 rewrite H3.
 
 assert (S4 D B C P = S D B P - S C B P)...
-unify_signed_areas.
+uniformize_signed_areas.
 congruence.
 Qed.
 
@@ -411,9 +423,11 @@ apply l2_12a_strong_3...
 Qed.
 
 
-Theorem Pascalian_Axiom :
+Theorem pascalian_ax :
  forall A B C P Q R : Point,
- Col A B C -> Col P Q R -> parallel A Q R B -> parallel B P Q C -> parallel A P R C.
+ Col A B C -> Col P Q R -> 
+ parallel A Q R B -> parallel B P Q C -> 
+ parallel A P R C.
 Proof with Geometry.
 unfold parallel,S4 in |- *.
 intros.
@@ -465,7 +479,9 @@ Theorem l1_25_aux :
  Col A B C ->
  Col X Y Z ->
  parallel A X B Y ->
- parallel B Y C Z -> B <> C -> Z <> Y -> A ** B / C ** B = X ** Y / Z ** Y.
+ parallel B Y C Z -> 
+ B <> C -> Z <> Y -> 
+ A ** B / C ** B = X ** Y / Z ** Y.
 Proof with Geometry.
 intros.
 assert (S C B Y = S Z B Y).
@@ -513,10 +529,120 @@ Theorem thales :
  ~ Col C B Y ->
  Col S B C ->
  Col S Y Z ->
- parallel Y B Z C -> B <> C -> Z <> Y -> S ** B / C ** B = S ** Y / Z ** Y.
+ parallel Y B Z C-> Z <> Y -> 
+ S ** B / C ** B = S ** Y / Z ** Y.
 Proof with Geometry.
 intros.
 apply l1_25...
+Qed.
+
+Theorem thales_2 :
+ forall S A B A' B' : Point,
+ ~ Col S A A' ->
+ Col S A B ->
+ Col S A' B' ->
+ parallel A A' B B' -> 
+ S ** B / S**A  = S ** B' / S**A'.
+Proof with Geometry.
+intros.
+
+cases_equality B' A'.
+subst.
+assert (S<>A').
+intro.
+subst.
+intuition.
+replace (S ** A' / S ** A') with 1.
+2:field;auto with Geom.
+
+cases_equality A B.
+subst.
+field.
+intro.
+assert (S=B).
+auto with Geom.
+subst.
+intuition.
+
+assert (Col A A' S).
+apply  (col_trans_1 A B A' S).
+assumption.
+unfold parallel, S4 in *.
+basic_simpl.
+auto with Geom.
+auto with Geom.
+
+assert (Col S A A') by auto with Geom.
+intuition.
+
+assert (S<>A).
+intro;subst.
+intuition.
+
+assert (S<>A').
+intro;subst.
+intuition.
+
+cases_equality A B.
+subst.
+replace (S ** B / S ** B) with 1.
+2:field.
+2:auto with Geom.
+clear H0.
+
+assert (Col A' B' B).
+unfold parallel, S4 in *.
+basic_simpl.
+auto with Geom.
+assert (Col A' S B).
+apply (col_trans_1 A' B' S B);auto with Geom.
+assert (Col S B A');auto with Geom.
+intuition.
+
+assert (S ** A / B ** A = S ** A' / B' ** A').
+apply (thales S A B B' A');auto with Geom.
+
+intro.
+assert (Col A A' S).
+apply (col_trans_1 A B A' S);auto with Geom.
+intuition.
+
+assert (B**A/S**A= B'**A' / S**A').
+
+assert (S ** A / B ** A * B**A =  S** A' / B' ** A' * B**A).
+rewrite H7.
+auto.
+replace (S ** A / B ** A * B ** A) with (S**A) in H8.
+2:field;auto with Geom.
+
+field_simplify_eq.
+rewrite H8.
+field.
+auto with Geom.
+split;auto with Geom.
+
+assert ( A**B / S ** A =  A'**B' / S ** A').
+uniformize_dir_seg.
+IsoleVar (A**B) H8.
+rewrite H8.
+field;split;auto with Geom.
+auto with Geom.
+
+assert (1+ A ** B / S ** A = 1+ A' ** B' / S ** A'). 
+rewrite H9.
+auto.
+replace (1 + A ** B / S ** A) with ((S**A + A**B) / S**A) in H10.
+2:field;auto with Geom.
+replace (1 + A' ** B' / S ** A') with ((S**A' + A'**B') / S**A') in H10.
+2:field;auto with Geom.
+
+assert (S**A + A**B=S**B).
+apply chasles;auto with Geom.
+assert (S**A' + A'**B'=S**B').
+apply chasles;auto with Geom.
+rewrite H11 in H10.
+rewrite H12 in H10.
+assumption.
 Qed.
 
 
@@ -549,13 +675,6 @@ assert (Col A P Q).
 eapply col_trans_1;apply H || auto.
 intuition.
 Qed.
-
-
-(** Axiom here ! *)
-
-Axiom parallel_side_eq_parallel : forall P Q C D,
-  parallel P Q C D -> P**Q=C**D -> C<>D -> parallel D Q P C. 
-
 
 Lemma two_sides_par_eq_parallelogram : 
   forall A B C D, 
@@ -904,8 +1023,6 @@ assert (Col P Q D).
 eapply col_trans_1; apply H7 || auto.
 intuition.
 Qed.
-
-
 
 Theorem l2_15 :
   forall A B P Q : Point,

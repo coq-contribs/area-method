@@ -1,13 +1,13 @@
 (***************************************************************************)
 (* Formalization of the Chou, Gao and Zhang's decision procedure.          *)
-(* Julien Narboux (Julien.Narboux@inria.fr)                                *)
+(* Julien Narboux (Julien@narboux.fr)                                      *)
 (* LIX/INRIA FUTURS 2004-2006                                              *)
+(* University of Strasbourg 2008                                           *)
 (***************************************************************************)
 
 Require Export field_general_properties.
 Require Import field.
-Require Import chou_axioms.
-Import F_scope.
+Require Import chou_gao_zhang_axioms.
 
 (** We define our own field tactic based on the new ring *)
 (** This tactic is geared toward automation because it does not generate non nullity conditions 
@@ -20,13 +20,16 @@ on our examples *)
 Ltac assumption_or_ax := assumption || apply chara_not_2.
 
 Ltac solve_conds :=  
+repeat split;
 repeat (assumption_or_ax || 
            apply nonzeromult || 
            apply nonzerodiv ||
            apply nonzeroinv).
 
 
-Ltac smart_field := field; repeat split; solve_conds.
+Ltac smart_field := field; solve_conds.
+
+Ltac smart_field_simplify_eq := field_simplify_eq;solve_conds.
 
 Lemma same_denom_add_1 : forall a b c d : F, 
   b<>0 ->
@@ -832,3 +835,13 @@ intros.
 Ffield.
 Qed.
 
+Lemma eq_simpl: forall a b : F,
+a-b = 0 -> a =b .
+Proof.
+intros.
+IsoleVar a H.
+rewrite H. 
+ring.
+Qed.
+
+Ltac ring_simplify_eq := apply eq_simpl;ring_simplify.

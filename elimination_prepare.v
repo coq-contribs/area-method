@@ -1,11 +1,12 @@
 (***************************************************************************)
 (* Formalization of the Chou, Gao and Zhang's decision procedure.          *)
-(* Julien Narboux (Julien.Narboux@inria.fr)                                *)
+(* Julien Narboux (Julien@narboux.fr)                                      *)
 (* LIX/INRIA FUTURS 2004-2006                                              *)
+(* University of Strasbourg 2008                                           *)
 (***************************************************************************)
 
-Require Export "elimination_lemmas".
-Import F_scope.
+Require Export area_elimination_lemmas.
+Require Export py_elimination_lemmas.
 
 (** Tactics to distinguish cases if necessary *)
 
@@ -33,6 +34,16 @@ end.
 
 (* TO DO modulo point order *)
 
+Ltac test_parallel A B C D Tac1 Tac2 := 
+ match goal with 
+| HPar : parallel A B C D |- _ => Tac1 HPar
+| HPar : ~ parallel A B C D |- _ => Tac2 HPar
+| _ => let HPar := fresh in 
+      (named_cases_parallel A B C D HPar;
+   [ Tac1 HPar | Tac2 HPar])
+end.
+
+
 (** The same for point equality *)
 
 Ltac test_equality A B Tac1 Tac2 := 
@@ -53,18 +64,23 @@ Ltac invdiffhyp A B :=
   (assert (Hnew := ldiff A B H); clear H).
 
 (** Unification tactic for signed areas but just concerning one point, 
-and puting this point in last position *)
+and puting this point in last position, except for Py where we put it either on
+both side, in the middle or on the right *)
 (** The use of this specific tactic during the elimination process is 
 faster than normalization of signed areas for every quantities *)
 
 Ltac put_on_the_right_areas P :=
   repeat match goal with
     | |- context[S P ?X1 ?X2] => 
-         replace_all (S P X1 X2) (S X1 X2 P);
-         [idtac|symmetry;apply S_1]
+         rewrite (S_1 P X1 X2) in *
     | |- context[S ?X1 P ?X2] => 
-         replace_all (S X1 P X2) (S X2 X1 P);
-         [idtac|symmetry;apply S_0]
+         rewrite (S_0 X1 P X2) in *
+end.
+
+Ltac put_on_the_right_pys P :=
+  repeat match goal with
+    | |- context[Py ?A P ?A] => rewrite (pyth_simpl_4 A P) in *	(* if it is in the middle with two equal points we put it on left and right *)
+    | |- context[Py P ?X1 ?X2] => rewrite (pyth_sym P X1 X2) in * (* if it is on the left we put it on the right *)
 end.
 
 (** This tactics remove one parallel hypotheses and replace it
@@ -133,9 +149,9 @@ Ltac unify_signed_areas_point P :=
        |  |- context [(S ?X4 ?X5 P)] =>
             (assert (Truc : S X4 X5 P = - S X1 X2 P);
              [ apply S_3 || apply S_2 || apply S_4
-             | rewrite_all Truc; clear Truc ]) ||
+             | rewrite Truc in *; clear Truc ]) ||
              (assert (Truc : S X4 X5 P = S X1 X2 P);
-               [ apply S_0 || apply S_1 | rewrite_all Truc; clear Truc ])
+               [ apply S_0 || apply S_1 | rewrite Truc in *; clear Truc ])
        end)
    end.
 
@@ -145,6 +161,7 @@ concerning the point *)
 
 Ltac unify_signed_areas_and_put_on_the_right P :=
  put_on_the_right_areas P;
+ put_on_the_right_pys P;
  put_on_the_right_ratios P;
  put_on_the_upper_right_ratios P;
  unify_signed_areas_point P.
@@ -172,3 +189,26 @@ intros.
 unify_signed_areas_and_put_on_the_right Y.
 reflexivity.
 Qed.
+
+Lemma test_4: forall A B Y, Py Y A B = Py B A Y.
+Proof.
+intros.
+unify_signed_areas_and_put_on_the_right Y.
+reflexivity.
+Qed.
+
+Lemma test_5: forall A Y, Py Y A Y = Py Y A Y.
+Proof.
+intros.
+(* check that it does not loop *)
+unify_signed_areas_and_put_on_the_right Y.
+reflexivity.
+Qed.
+
+Lemma test_6: forall C B A E, Py B E B + Py E A C = Py E B E + Py C A E.
+Proof.
+intros.
+unify_signed_areas_and_put_on_the_right E.
+reflexivity.
+Qed.
+
