@@ -215,7 +215,6 @@ assert (Col C D E).
 eapply par_col_col_1.
 2:assert (Col C D F).
 2:Geometry.
-.
 2:apply H4.
 Geometry.
 assert (Col C E F).
