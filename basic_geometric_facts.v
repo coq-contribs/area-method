@@ -1229,3 +1229,24 @@ basic_simpl...
 Qed.
 
 Hint Resolve eq_diff_diff : Geom.
+
+Lemma parallel_side_eq_parallel' : forall P Q C D,
+  parallel P Q C D -> P**Q=C**D -> parallel D Q P C. 
+Proof.
+intros.
+cases_equality C D.
+subst.
+basic_simpl.
+assert (P=Q).
+apply A1b.
+assumption.
+subst.
+clear H0.
+unfold parallel,S4 in *.
+basic_simpl.
+trivial.
+apply parallel_side_eq_parallel;auto.
+Qed.
+
+
+
