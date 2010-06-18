@@ -360,11 +360,6 @@ Theorem elim_py_inter_ll_middle :
  inter_ll Y P Q U V ->
  Py A Y B = - (S P V U / S4 P U Q V) * Py A Q B + - (S Q U V / S4 P U Q V) * Py A P B -
 - (S P V U / S4 P U Q V) * - (S Q U V / S4 P U Q V) * Py P Q P.
-
-(* S P U Q / S4 P U Q V * Py A V B - 
-                 S P V Q / S4 P U Q V *  Py A U B + 
-                 S U P Q / S4 P U Q V * S V P Q / S4 P U Q V * Py U V U.
-*)
 Proof.
 intros.
 unfold inter_ll in H.
@@ -390,14 +385,12 @@ ring.
 auto with Geom.
 Qed.
 
-
 Theorem elim_py_inter_ll_middle_invariant :
  forall A B P Q U V Y : Point,
  inter_ll Y P Q U V -> S4  P U Q V <> 0.
 Proof.
 exact elim_py_inter_ll_right_invariant.
 Qed.
-
 
 Theorem elim_py_on_foot_right :
  forall A B P U V Y : Point,
@@ -457,7 +450,6 @@ uniformize_dir_seg.
 replace (U ** V * U ** V + - U ** V * - U ** V) with (2* U ** V * U ** V) by ring.
 repeat (apply nonzeromult);auto with Geom.
 Qed.
-
 
 Theorem elim_py_on_foot_right_invariant :
  forall A B P U V Y : Point,
@@ -1079,10 +1071,80 @@ auto with Geom.
 intuition.
 Qed.
 
-
 Theorem elim_ratio_on_foot_a_invariant : forall C D,
 C<>D -> Py C D C <> 0.
 Proof.
+auto with Geom.
+Qed.
+
+Theorem elim_ratio_on_foot_spec_a :
+forall Y P U V A C D : Point,
+on_foot Y P U V ->
+Col A U V ->
+parallel A Y C Y ->
+C <> Y ->
+A <> Y ->
+A**Y / C**Y = (Py P U V * Py4 P C A V + Py P V U * Py4 P C A U) /
+(Py P U V * Py C V C + Py P V U * Py C U C - Py P U V * Py P V U).
+Proof.
+intros.
+rewrite (elim_ratio_on_foot_a Y P U V) by auto.
+assert (T:= (elim_ratio_on_foot_a_invariant C Y H2)).
+
+unfold Py4.
+rewrite (elim_py_on_foot_right P C P U V) in * by auto.
+rewrite (elim_py_on_foot_right A C P U V) in * by auto.
+rewrite (pyth_simpl_4 C Y) in *.
+rewrite (elim_py_on_foot_left_right C P U V Y) in * by auto.
+replace (((Py P U V * Py P C V + Py P V U * Py P C U) / Py U V U -
+ (Py P U V * Py A C V + Py P V U * Py A C U) / Py U V U) /
+((Py P U V * Py P U V * Py V C V + Py P U V * Py P V U * Py V C U +
+  Py P U V * Py P V U * Py U C V + Py P V U * Py P V U * Py U C U) /
+ (Py U V U * Py U V U)))
+with 
+(((Py P U V * Py P C V + Py P V U * Py P C U) -
+ (Py P U V * Py A C V + Py P V U * Py A C U) ) /
+((Py P U V * Py P U V * Py V C V + Py P U V * Py P V U * Py V C U +
+  Py P U V * Py P V U * Py U C V + Py P V U * Py P V U * Py U C U) /
+ ( Py U V U))) in *.
+replace (Py P U V * Py P C V + Py P V U * Py P C U -
+ (Py P U V * Py A C V + Py P V U * Py A C U))
+with (Py P U V * Py P C V + Py P V U * Py P C U -
+Py P U V * Py A C V - Py P V U * Py A C U) in * by ring.
+replace (Py P U V * Py P C V + Py P V U * Py P C U - Py P U V * Py A C V -
+ Py P V U * Py A C U)
+with
+(Py P U V * Py4 P C A V + Py P V U * Py4 P C A U) in * by (unfold Py4;ring).
+replace ((Py P U V * Py P U V * Py V C V + Py P U V * Py P V U * Py V C U +
+  Py P U V * Py P V U * Py U C V + Py P V U * Py P V U * Py U C U) / 
+ Py U V U)
+with (
+ Py P U V * Py C V C +
+Py P V U * Py C U C - Py P U V * Py P V U) in *.
+
+trivial.
+
+unfold Py.
+uniformize_dir_seg.
+field.
+basic_simpl.
+replace(U ** V * U ** V + U ** V * U ** V)
+with (2*U ** V * U ** V) by ring.
+unfold on_foot in H;use H.
+repeat (apply nonzeromult);auto with Geom.
+
+field.
+split.
+unfold on_foot in H.
+use H.
+auto with Geom.
+intro Ha.
+rewrite Ha in *.
+replace ( 0 / (Py U V U * Py U V U) ) with 0 in *.
+intuition.
+field.
+unfold on_foot in H.
+use H.
 auto with Geom.
 Qed.
 
@@ -1123,6 +1185,35 @@ cut (~ parallel Y P U V).
 auto with Geom.
 apply perp_not_parallel; auto with Geom.
 Qed.
+
+Theorem elim_ratio_on_foot_spec_b :
+forall Y P U V A C : Point,
+on_foot Y P U V ->
+~ Col A U V ->
+parallel A Y C Y ->
+C <> Y ->
+A**Y / C**Y = S A U V / S C U V.
+Proof.
+intros.
+rewrite (elim_ratio_on_foot_b Y P U V A C) by assumption.
+unfold S4.
+replace (S C Y V) with (S V C Y) by auto with Geom.
+rewrite (elim_area_on_foot C U P U V Y) by assumption.
+rewrite (elim_area_on_foot V C P U V Y) by assumption.
+basic_simpl.
+uniformize_signed_areas.
+replace (Py P U V * S C U V / Py U V U + Py P V U * S C U V / Py U V U)
+with (S C U V).
+trivial.
+unfold Py.
+uniformize_dir_seg.
+basic_simpl.
+field.
+replace (U ** V * U ** V + U ** V * U ** V) with (2*U ** V * U ** V) by ring.
+unfold on_foot in H;decompose [and] H.
+repeat (apply nonzeromult);auto with Geom.
+Qed.
+
 
 Theorem elim_ratio_on_foot_b_invariant :
 forall Y P U V A C D : Point,
@@ -1187,7 +1278,7 @@ auto with Geom.
 intuition.
 Qed.
 
-Theorem elim_ratio_on_perp_d_a :
+Theorem elim_ratio_on_perp_d_a_aux :
  forall Y P Q A C D : Point, forall r: F,
 on_perp_d Y P Q r->
 Col A P Y  ->
@@ -1198,6 +1289,10 @@ A<>P ->
 A**Y / C**D = (S A P Q -r/(2+2) * Py P Q P)/(S4 C P D Q).
 Proof.
 intros.
+
+
+
+
 rename H4 into Hap.
 assert (T:= (elim_ratio_on_perp_d_a_invariant Y P Q A C D r H H0 H1 H3 H2)).
 
@@ -1336,7 +1431,112 @@ auto with Geom.
 auto.
 Qed.
 
-Theorem elim_ratio_on_perp_d_b :
+Theorem elim_ratio_on_perp_d_a :
+ forall Y P Q A C D : Point, forall r: F,
+on_perp_d Y P Q r->
+Col A P Y  ->
+parallel A Y C D ->
+C<>D ->
+A<>Y ->
+A**Y / C**D = (S A P Q -r/(2+2) * Py P Q P)/(S4 C P D Q).
+Proof.
+intros.
+cases_equality A P.
+subst A.
+clear H0.
+basic_simpl.
+unfold on_perp_d in H.
+use H.
+replace (0 - r / (2 + 2) * Py P Q P) with (S Q P Y).
+replace (P ** Y / C ** D) with (- (Y**P / C**D)).
+rewrite (elim_length_ratio_inter_ll_1 Y C D  P Q P Y P).
+uniformize_signed_areas.
+field.
+cut (~ parallel C D P Q).
+auto with Geom.
+assert (perp C D P Q).
+apply (perp_para_perp P Y P Q C D);auto with Geom.
+intro.
+assert  (T:=parallel_not_perp C D P Q H6 H2 H0).
+intuition.
+
+unfold inter_ll.
+repeat split;auto with Geom.
+intro.
+assert (T:=parallel_not_perp P Y P Q H H3 H0).
+assert (perp P Y P Q) by auto with Geom.
+intuition.
+intro.
+uniformize_signed_areas.
+rewrite H in H4.
+basic_simpl.
+assert (r * Py P Q P <> 0) by (apply nonzeromult;auto with Geom).
+intuition.
+auto.
+auto with Geom.
+uniformize_dir_seg.
+field.
+auto with Geom.
+uniformize_signed_areas.
+IsoleVar (S P Q Y) H4.
+rewrite H4.
+field.
+apply nonzeromult;auto with Geom.
+replace (2+2) with (2*2) by ring.
+apply nonzeromult;auto with Geom.
+
+apply elim_ratio_on_perp_d_a_aux;auto.
+Qed.
+
+Theorem elim_ratio_on_perp_d_spec_a :
+ forall Y P Q A C : Point, forall r: F,
+on_perp_d Y P Q r->
+Col A P Y  ->
+parallel A Y C Y ->
+C<>Y ->
+A<>Y ->
+A**Y / C**Y = (S A P Q - r / (2 + 2) * Py P Q P) /
+(S Q C P -r/(2+2) * Py P Q P).
+Proof.
+intros.
+rewrite (elim_ratio_on_perp_d_a Y P Q A C Y r); try assumption.
+unfold S4.
+replace (S C Y Q) with (S Q C Y) by auto with Geom.
+rewrite (elim_area_on_perp_d C P P Q Y r) by assumption.
+rewrite (elim_area_on_perp_d Q C P Q Y r) by assumption.
+basic_simpl.
+unfold Py4.
+basic_simpl.
+uniformize_signed_areas.
+replace (0 - r / (2 + 2) * (Py P C P - Py Q C P) + (S Q C P - r / (2 + 2) * Py P Q C))
+with (S Q C P - r / (2 + 2) * (Py P C P - Py Q C P) - r / (2 + 2) * Py P Q C) by ring.
+replace (Py P C P - Py Q C P) with (Py C P Q) by 
+(unfold Py;uniformize_dir_seg;basic_simpl;ring).
+replace (S Q C P - r / (2 + 2) * Py C P Q - r / (2 + 2) * Py P Q C) with 
+(S Q C P -r/(2+2) * Py P Q P).
+2:unfold Py.
+2:uniformize_dir_seg.
+2:basic_simpl.
+2:field.
+2:apply nonzeromult; auto with Geom.
+trivial.
+Qed.
+
+Lemma elim_ratio_on_perp_d_b_auxi : 
+  forall A Y C D P Q : Point, 
+  on_parallel_d Y A C D 1 ->
+  Py C P Q - Py D P Q = Py A P Q - Py Y P Q.
+Proof.
+intros.
+replace (Py Y P Q) with (Py Q P Y) by apply pyth_sym.
+rewrite (elim_py_on_parallel_d_right Q P A C D Y 1) by assumption.
+replace (Py A P Q) with (Py Q P A) by apply pyth_sym.
+replace (Py Q P D) with (Py D P Q) by apply pyth_sym.
+replace (Py Q P C) with (Py C P Q) by apply pyth_sym.
+ring.
+Qed.
+
+Theorem elim_ratio_on_perp_d_b_aux :
  forall Y P Q A C D : Point, forall r: F,
  on_perp_d Y P Q r->
  ~ Col A P Y  ->
@@ -1352,6 +1552,7 @@ subst.
 intuition.
 
 assert (T:=on_line_dex_spec_strong_f A Y C D H1 H4).
+
 elim T;intros D' HD'.
 clear T.
 decompose [and] HD'; clear HD'.
@@ -1440,11 +1641,58 @@ intuition.
 Qed.
 
 
+Theorem elim_ratio_on_perp_d_b :
+ forall Y P Q A C D : Point, forall r: F,
+ on_perp_d Y P Q r->
+ ~ Col A P Y  ->
+ parallel A Y C D ->
+ C<>D ->
+ A**Y / C**D = Py A P Q / Py4 C P D Q.
+Proof.
+intros.
+elim (classic (A**Y=C**D)).
+intro.
+assert (on_parallel_d Y A C D 1).
+unfold on_parallel_d;repeat split;auto with Geom.
+ring_simplify;auto.
+rewrite H3.
+replace (C ** D / C ** D) with 1 by (field;auto with Geom).
+assert (T:=elim_ratio_on_perp_d_b_auxi A Y C D P Q H4).
+assert (Py A P Q = Py4 C P D Q).
+unfold Py4.
+assert (Py Y P Q = 0).
+unfold on_perp_d in H;use H; unfold perp, Py4 in *.
+basic_simpl;assumption.
+rewrite H5 in T.
+ring_simplify in T.
+rewrite <- T.
+ring.
+rewrite H5.
+field.
+eapply elim_ratio_on_perp_d_b_invariant;eauto.
+intros.
+eapply elim_ratio_on_perp_d_b_aux;eauto.
+Qed.
 
 
 
 
-
+Theorem elim_ratio_on_perp_d_spec_b :
+ forall Y P Q A C : Point, forall r: F,
+ on_perp_d Y P Q r->
+ ~ Col A P Y  ->
+ parallel A Y C Y ->
+ C<>Y ->
+ A**Y / C**Y = Py A P Q / Py C P Q.
+Proof.
+intros.
+rewrite (elim_ratio_on_perp_d_b Y P Q A C Y r) by assumption.
+unfold Py4.
+replace (Py Y P Q) with (Py Q P Y) by auto with Geom.
+rewrite (elim_py_on_perp_d_right Q P P Q Y r) by assumption.
+basic_simpl.
+trivial.
+Qed.
 
 
 

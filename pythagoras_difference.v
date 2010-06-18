@@ -29,6 +29,20 @@ Axiom on_foot_area : forall A B C F,
   on_foot F A B C ->
   2 * 2 * S A B C * S A B C = A**F * A**F * B**C * B**C.
 
+Lemma on_foot_area_paper : forall A B C F, 
+  perp F A B C -> Col F B C ->
+  2 * 2 * S A B C * S A B C = A**F * A**F * B**C * B**C.
+Proof.
+intros.
+cases_equality B C.
+subst.
+basic_simpl.
+trivial.
+apply on_foot_area.
+unfold on_foot;auto.
+Qed.
+
+
 Lemma pyth_simpl_1 : forall A B, Py A A B = 0.
 Proof.
 intros.
