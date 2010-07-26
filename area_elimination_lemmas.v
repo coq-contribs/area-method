@@ -5,7 +5,7 @@
 (* University of Strasbourg 2008                                           *)
 (***************************************************************************)
 
-Require  Export advanced_parallel_lemmas.
+Require Export advanced_parallel_lemmas.
 Require Export geometry_tools.
 
 (*********************************************************************)
@@ -172,10 +172,11 @@ Lemma parallel_transitivity : forall A B C D E F,
   parallel A B E F.
 Proof.
 intros.
-cases_col F C D.
-Focus 2.
-cases_col D A B.
-Focus 2.
+
+cases_equality A B.
+
+subst;Geometry.
+
 assert (on_parallel E F C D).
 unfold on_parallel;intuition Geometry.
 assert (on_parallel_d E F C D (F ** E / C ** D)).
@@ -183,22 +184,17 @@ apply on_parallel_to_on_parallel_d.
 assumption.
 set (F ** E / C ** D).
 unfold parallel,S4.
-replace (S A E B) with (S B A E).
-2:Geometry.
-assert (S B A E = S B A F + f * S4 B C A D). 
+replace (S A E B) with (S B A E) by Geometry.
+assert (T: S B A E = S B A F + f * S4 B C A D). 
 apply (elim_area_on_parallel_d B A C D F E).
 auto.
-rewrite H6.
+rewrite T.
 unfold S4.
-replace (S B C A) with (S A B C).
-2:Geometry.
+replace (S B C A) with (S A B C) by Geometry.
 assert (on_parallel_d C D A B ( D ** C / A ** B)). 
-assert (A<>B).
-eauto with Geom.
 unfold on_parallel_d.
 repeat split;Geometry.
-field.
-Geometry.
+field;Geometry.
 set (D ** C / A ** B).
 replace (S A B C) with (S A B D + f0 * S4 A A B B).
 basic_simpl.
@@ -207,64 +203,6 @@ ring.
 symmetry.
 apply elim_area_on_parallel_d.
 assumption.
-
-assert (parallel A B C F).
-eapply col_par_par;eauto.
-Geometry.
-assert (Col C D E).
-eapply par_col_col_1.
-2:assert (Col C D F).
-2:Geometry.
-2:apply H4.
-Geometry.
-assert (Col C E F).
-eapply col_trans_1 with (B:= D);Geometry.
-cases_equality F C.
-subst F.
-clear H2 H3 H5.
-
-cut (parallel A B C E).
-Geometry.
-eapply col_par_par;eauto.
-
-cut (parallel A B F E).
-Geometry.
-eapply col_par_par.
-apply H6.
-Geometry.
-Geometry.
-
-assert (Col A B C).
-eapply par_col_col_1 with (C:=D);Geometry.
-cases_equality A B.
-subst A.
-Geometry.
-assert (Col B C D).
-eapply col_trans_1 with (B:=A);Geometry.
-assert (parallel E F D B).
-eapply col_par_par.
-assert (D<>C).
-Geometry.
-apply H7.
-Geometry.
-Geometry.
-
-cases_equality B D.
-subst D.
-clear H3 H6 H7.
-cut (parallel E F B A).
-Geometry.
-eapply col_par_par.
-assert (B<>C);Geometry.
-apply H3.
-Geometry.
-Geometry.
-cut (parallel E F B A).
-Geometry.
-eapply col_par_par.
-apply H8.
-Geometry.
-Geometry.
 Qed.
 
 Lemma elim_area_on_inter_line_parallel :
