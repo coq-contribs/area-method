@@ -5,8 +5,8 @@
 (* University of Strasbourg 2008                                           *)
 (***************************************************************************)
 
-Require Export "geometry_tools_lemmas".
-Require Export "general_tactics".
+Require Export geometry_tools_lemmas.
+Require Export general_tactics.
 Require Import List.
 Require Import Quote.
 

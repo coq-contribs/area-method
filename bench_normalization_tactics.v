@@ -5,8 +5,8 @@
 (* University of Strasbourg 2008                                           *)
 (***************************************************************************)
 
-Require Import "geometry_tools".
-Require Import "Rgeometry_tools".
+Require Import geometry_tools.
+Require Import Rgeometry_tools.
 
 Ltac local_uniformize_signed_areas := Runiformize_signed_areas.
 (*
