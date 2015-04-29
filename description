@@ -11,4 +11,4 @@ Changelog
 2.1 : remove some not needed assumptions in some elimination lemmas (2010)
 2.0 : extension implementation to Euclidean geometry (2009-2010)
 1.0 : first implementation for affine geometry (2004)
-Keywords: geometry Chou Gao Zhang area method decision procedure automatic theorem proving
+Keywords: geometry, Chou Gao Zhang area method, decision procedure, automatic theorem proving
