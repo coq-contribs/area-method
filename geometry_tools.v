@@ -151,7 +151,7 @@ Ltac uniformize_dir_seg_goal :=
    |  |- context [(?X1 ** ?X2)] =>
        match goal with
        |  |- context [(?X3 ** ?X4)] =>
-           match constr:(X3, X4) with
+           match constr:((X3, X4)) with
            | (?X2, ?X1) => rewrite (A1a X1 X2)
            end
        end

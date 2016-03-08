@@ -31,11 +31,11 @@ Inductive AF : Type :=
 (* Checks if var is in lvar *)
 
 Ltac List_mem var lvar :=
-  match constr:lvar with
-  | nil => constr:false
+  match constr:(lvar) with
+  | nil => constr:(false)
   | cons ?X1 ?X2 =>
       match constr:(X1 = var) with
-      | (?X1 = ?X1) => constr:true
+      | (?X1 = ?X1) => constr:(true)
       | _ => List_mem var X2
       end
   end.
@@ -44,13 +44,13 @@ Ltac List_mem var lvar :=
 
 Ltac build_var_point_list_aux lvar point :=
      let res := List_mem (PVar point) lvar in
-      match constr:res with
+      match constr:(res) with
       | true => lvar
       | false => constr:(cons (PVar point) lvar)
       end.
 
 Ltac build_var_list_aux lvar trm :=
-  match constr:trm with
+  match constr:(trm) with
   | F0 => lvar
   | F1 => lvar
   | (Fplus ?X1 ?X2) =>
@@ -74,7 +74,7 @@ Ltac build_var_list_aux lvar trm :=
 
   | ?X1 =>
     let res := List_mem (FVar X1) lvar in
-      match constr:res with
+      match constr:(res) with
       | true => lvar
       | false => constr:(cons (FVar X1) lvar)
       end
@@ -84,17 +84,17 @@ Ltac build_var_list trm :=
   build_var_list_aux (@nil AVars) trm.
 
 Ltac List_assoc elt lst :=
-  match constr:lst with
+  match constr:(lst) with
   | nil => fail
   | (cons (@pairT AVars nat ?X1 ?X2) ?X3) =>
       match constr:(elt = X1) with
-      | (?X1 = ?X1) => constr:X2
+      | (?X1 = ?X1) => constr:(X2)
       | _ => List_assoc elt X3
       end
   end.
 
 Ltac number_aux lvar cpt :=
-  match constr:lvar with
+  match constr:(lvar) with
   | nil => constr:(@nil (prodT AVars nat))
   | cons ?X2 ?X3 =>
       let l2 := number_aux X3 (Datatypes.S cpt) in
@@ -153,9 +153,9 @@ S idx1 (interp_AP_to_Point lvar e2) (interp_AP_to_Point lvar e3)
 (* Metaification *)
 
 Ltac interp_A lvar trm :=
-  match constr:trm with
-  | F0 => constr:AF0
-  | F1 => constr:AF1
+  match constr:(trm) with
+  | F0 => constr:(AF0)
+  | F1 => constr:(AF1)
   | (Fplus ?X1 ?X2) =>
       let e1 := interp_A lvar X1 with e2 := interp_A lvar X2 in
       constr:(AFplus e1 e2)
@@ -450,7 +450,7 @@ Ltac generalize_all_eq_neqF :=
  end.
 
 Ltac interp_formula2 lvar trm :=
-match constr:trm with
+match constr:(trm) with
   | (implies ?X1 ?X2) =>
       let e1 := interp_formula2 lvar X1 in
       let e2 := interp_formula2 lvar X2 in
@@ -494,25 +494,25 @@ Ltac prepare_goal := generalize_all_eq;put_implies;quote interp_f.
 Ltac un_prepare_goal := simpl;unfold implies;intros.
 
 Ltac build_var_list_eq varlist x :=
- match constr:x with 
+ match constr:(x) with 
      	?X2=?X3 => 
            let l1 := build_var_list_aux varlist X2 in
    	   let l2 := build_var_list_aux l1 X3 in
-           constr:l2 
+           constr:(l2) 
        | ?X2<>?X3 => 
           let l1 := build_var_list_aux varlist X2 in
           let l2 := build_var_list_aux l1 X3 in
-          constr:l2
+          constr:(l2)
    | _ => varlist
 end.
 
 Ltac union_vars_aux varlist trm :=  
-  match constr:trm with
+  match constr:(trm) with
    | interp_f ?X1 => union_vars_aux varlist X1 
    | f_imp ?X1 ?X2 => 
         let lvar1 := union_vars_aux varlist X1 in 
         let lvar2 := union_vars_aux lvar1 X2 in
-        constr:lvar2
+        constr:(lvar2)
    | f_const ?X1 => build_var_list_eq varlist X1
  end.
 
@@ -527,11 +527,11 @@ Ltac compute_vars_of_the_goal :=
 end.
 
 Ltac uniformize_quantities varlist trm :=
-  match constr:trm with
+  match constr:(trm) with
    | interp_f ?X1 => uniformize_quantities varlist X1 
    | f_imp ?X1 ?X2 => uniformize_quantities varlist X1;uniformize_quantities varlist X2
    | f_const ?X1 => 
-                (match constr:X1 with 
+                (match constr:(X1) with 
                     ?X1 = ?X2 => uniformize_term X1 varlist;uniformize_term X2 varlist
                   | ?X1 <> ?X2 => uniformize_term X1 varlist;uniformize_term X2 varlist
                     |_ => idtac

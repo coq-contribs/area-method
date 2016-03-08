@@ -27,7 +27,7 @@ This module defines a few tactics :
 Ltac NormalizeRing H :=
   match goal with
   | i:(?X1 = ?X2) |- _ =>
-      match constr:i with
+      match constr:(i) with
       | H => generalize H; ring_simplify X1 X2; clear H; intro H
       | _ => fail
       end
@@ -108,7 +108,7 @@ Qed.
 
 
 Ltac IsoleVarAux1 var H T Hyp :=
-  match constr:T with
+  match constr:(T) with
   | (var = ?X2 :>?X1) =>
       assert (Hypazerty : T);
        [ exact H | clear Hyp; rename Hypazerty into Hyp ]
@@ -200,7 +200,7 @@ Ltac IsoleVarAux1 var H T Hyp :=
 
 
 Ltac IsoleVarAux var H T Hyp :=
-  match constr:T with
+  match constr:(T) with
   | (?X2 = ?X3 :>?X1) =>
       IsoleVarAux1 var H T Hyp ||
         IsoleVarAux1 var (sym_eq H) (X3 = X2 :>X1) Hyp
@@ -208,8 +208,8 @@ Ltac IsoleVarAux var H T Hyp :=
 
 Ltac TypeOf H :=
   match goal with
-  | id:?X1 |- _ => match constr:id with
-                   | H => constr:X1
+  | id:?X1 |- _ => match constr:(id) with
+                   | H => constr:(X1)
                    | _ => fail
                    end
   end.

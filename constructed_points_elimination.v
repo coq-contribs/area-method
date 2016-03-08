@@ -66,7 +66,7 @@ Ltac elimi_inter_ll_gen  P Q U V A Y C D H Hneq :=
 Ltac elimi_inter_ll P Q U V A Y C D H :=
   let Hi := fresh in
   (assert (Hi : C <> D); [ Geometry | idtac ];
-    match constr:(A, (C, D)) with
+    match constr:((A, (C, D))) with
 (** In the first cases we know the points are collinear *)
     | (U, (V, Y)) =>
         let Hfresh := fresh in

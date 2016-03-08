@@ -16,7 +16,7 @@ Ltac freepoints_independant A B C H D E F :=
 (* Exprime tout suivant une base A B C *)
 
 Ltac iter_coord_expr A B C H E :=
-  match constr:E with
+  match constr:(E) with
   | (?X1 = ?X2) =>
       iter_coord_expr A B C H X1; iter_coord_expr A B C H X2
   | (?X1 + ?X2) =>
@@ -30,53 +30,53 @@ Ltac iter_coord_expr A B C H E :=
   | (- ?X1) => iter_coord_expr A B C H X1
   | (/ ?X1) => iter_coord_expr A B C H X1
   | ?X5 =>
-      match constr:X5 with
+      match constr:(X5) with
       | (S ?X1 ?X2 ?X3) =>
-          match constr:X1 with
+          match constr:(X1) with
           | A =>
-              match constr:X2 with
+              match constr:(X2) with
               | B => idtac
               | C => idtac
               | _ =>
-                  match constr:X3 with
+                  match constr:(X3) with
                   | B => idtac
                   | C => idtac
                   | _ => freepoints_independant A B C H X1 X2 X3
                   end
               end
           | B =>
-              match constr:X2 with
+              match constr:(X2) with
               | A => idtac
               | _ =>
-                  match constr:X3 with
+                  match constr:(X3) with
                   | A => idtac
                   | _ => freepoints_independant A B C H X1 X2 X3
                   end
               end
           | C =>
-              match constr:X2 with
+              match constr:(X2) with
               | A => idtac
               | _ =>
-                  match constr:X3 with
+                  match constr:(X3) with
                   | A => idtac
                   | _ => freepoints_independant A B C H X1 X2 X3
                   end
               end
           | _ =>
-              match constr:X2 with
+              match constr:(X2) with
               | A =>
-                  match constr:X3 with
+                  match constr:(X3) with
                   | C => idtac
                   | B => idtac
                   | _ => freepoints_independant A B C H X1 X2 X3
                   end
               | B =>
-                  match constr:X3 with
+                  match constr:(X3) with
                   | A => idtac
                   | _ => freepoints_independant A B C H X1 X2 X3
                   end
               | C =>
-                  match constr:X3 with
+                  match constr:(X3) with
                   | A => idtac
                   | _ => freepoints_independant A B C H X1 X2 X3
                   end
