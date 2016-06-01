@@ -113,7 +113,9 @@ assert (Col W U Y).
 eapply col_trans_1 with (B:= V)...
 
 cases_equality Y W.
+Unset Regular Subst Tactic.
 subst W.
+Set Regular Subst Tactic.
 clear H13 H12 H5.
 assert (Col O V B).
 eapply col_trans_1 with (B:= Y)...
