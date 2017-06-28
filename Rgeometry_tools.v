@@ -195,7 +195,7 @@ Proof.
   unfold Is_true in H1.
   rewrite (H n1 H1).
   trivial.
-Save.
+Qed.
 
 Fixpoint simplif (e:AF) {struct e} : AF :=
   match e with 
