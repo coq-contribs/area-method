@@ -570,6 +570,11 @@ replace (-(xc * (X - xd + yd)) - - ((X - xc + yc) * xd))
 auto.
 Qed.
 
+Lemma aux: forall x, x<>0 -> -x<>0.
+Proof.
+auto with field_hints.
+Qed. 
+
 Lemma free_points_ratio_elimination_8 : forall O U V A B C D: Point,
   parallel A B C D ->
   C<>D ->
@@ -600,10 +605,6 @@ replace (S O U V) with (- S O V U) by auto with Geom.
 replace (- S O V U * (S O V D - S O V C) + S O V C * S O U D - S O V D * S O U C)
 with    (- (S O V U * (S O V D - S O V C) - S O V C * S O U D + S O V D * S O U C))
  by ring.
-Lemma aux: forall x, x<>0 -> -x<>0.
-Proof.
-auto with field_hints.
-Qed. 
 apply aux.
 apply (free_points_ratio_elimination_7_non_zero_denom O V U A B C D); auto with Geom.
 apply (free_points_ratio_elimination_7_non_zero_denom O V U A B C D); auto with Geom.
