@@ -28,6 +28,7 @@ Definition Fdiv (r1 r2 : F) : F := Fmult r1 (Finv r2).
 (* Notations  *)
 (***************)
 
+Declare Scope F_scope.
 Delimit Scope F_scope with F.
 Infix "+" := Fplus : F_scope.
 Infix "-" := Fminus : F_scope.
