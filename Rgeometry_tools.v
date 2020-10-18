@@ -8,7 +8,6 @@
 Require Export geometry_tools_lemmas.
 Require Export general_tactics.
 Require Import List.
-Require Import Quote.
 
 Inductive AVars : Type :=  
   | PVar : Point -> AVars
@@ -490,7 +489,22 @@ end.
 *)
 Ltac prepare_goal2 lvar := generalize_all_eq_neqF;put_implies;interp_formula2_goal lvar.
 
-Ltac prepare_goal := generalize_all_eq;put_implies;quote interp_f.
+Ltac quote_interp_f :=
+  let rec aux c :=
+    match c with
+    | implies ?A ?B =>
+      let a := aux A in
+      let b := aux B in
+      constr:(f_imp a b)
+    | c => constr:(f_const c)
+    end in
+  match goal with
+  |- ?G =>
+    let g := aux G in
+    change (interp_f g)
+  end.
+
+Ltac prepare_goal := generalize_all_eq;put_implies;quote_interp_f.
 Ltac un_prepare_goal := simpl;unfold implies;intros.
 
 Ltac build_var_list_eq varlist x :=
