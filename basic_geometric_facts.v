@@ -242,7 +242,7 @@ assert (A = B)...
 intuition...
 Qed.
 
-Hint Resolve col_trans_1.
+Hint Resolve col_trans_1 : Geom.
 
 Lemma build_point_not_collinear_1 : forall A B, A<>B -> exists C, ~ Col A B C. 
 Proof with Geometry.
@@ -303,7 +303,7 @@ assert (Col A P B)...
 eauto with Geom...
 Qed.
 
-Hint Resolve col_not_col_1.
+Hint Resolve col_not_col_1 : Geom.
 
 Theorem A6_1 :
  forall P Q A M : Point,
